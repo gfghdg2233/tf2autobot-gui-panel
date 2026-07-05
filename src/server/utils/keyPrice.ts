@@ -45,7 +45,7 @@ export async function getKeyPrice(): Promise<number> {
     } catch (err) {
         if (Date.now() - lastFetchErrorLogged > 5 * 60 * 1000) {
             lastFetchErrorLogged = Date.now();
-            console.error('Failed to fetch key price (using fallback):', err?.message ?? err);
+            console.error('Failed to fetch key price (using fallback):', err instanceof Error ? err.message : err);
         }
     }
 

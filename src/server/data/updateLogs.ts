@@ -7,6 +7,17 @@ export interface UpdateLogEntry {
 
 export const UPDATE_LOGS: UpdateLogEntry[] = [
 	{
+		version: '3.4.0',
+		date: '2026-07-05',
+		title: 'Theme selector and color palettes',
+		changes: [
+			'Added theme picker in the header with 11 color palettes',
+			'Mann Co., BLU Base, RED Fortress, Australium, Neon Grid, and more',
+			'Theme choice is saved in your browser via localStorage',
+			'Header, navigation, panels, and accents adapt to each theme'
+		]
+	},
+	{
 		version: '3.3.3',
 		date: '2026-07-05',
 		title: 'Stability and settings fixes',

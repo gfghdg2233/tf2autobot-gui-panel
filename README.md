@@ -11,6 +11,7 @@ A web panel for managing your [TF2Autobot](https://github.com/TF2Autobot/tf2auto
 
 ## Features
 
+- **Theme selector** — 11 color palettes (Mann Co., BLU, RED, Australium, Neon, and more); saved in your browser
 - **Pricelist management** — search, filter, grid/list views, bulk add, manual and autopriced items
 - **Live backpack.tf prices** — reference buy/sell prices from [pricedb.io](https://pricedb.io), auto-refresh, and a “differs from bptf” filter
 - **Trades** — browse completed and active trades

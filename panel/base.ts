@@ -1,5 +1,6 @@
 import './style/app.scss';
 import 'bootstrap';
+import { initThemeSelector } from './theme';
 
 function highlightActiveNav(): void {
     const path = window.location.pathname.replace(/\/$/, '') || '/';
@@ -13,7 +14,11 @@ function highlightActiveNav(): void {
 }
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', highlightActiveNav);
+    document.addEventListener('DOMContentLoaded', () => {
+        highlightActiveNav();
+        initThemeSelector();
+    });
 } else {
     highlightActiveNav();
+    initThemeSelector();
 }
