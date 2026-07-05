@@ -7,6 +7,16 @@ export interface UpdateLogEntry {
 
 export const UPDATE_LOGS: UpdateLogEntry[] = [
 	{
+		version: '3.4.2',
+		date: '2026-07-05',
+		title: 'Trade Discord webhook preview and docs',
+		changes: [
+			'Trades page shows a Discord-style preview matching tf2autobot-pricedb trade-summary embeds',
+			'Documented bot trade webhook setup in patches/tf2autobot/DISCORD_WEBHOOKS.md',
+			'Clarified difference between bot trade webhooks (Settings) and GUI version webhooks (.env)'
+		]
+	},
+	{
 		version: '3.4.1',
 		date: '2026-07-05',
 		title: 'Discord update webhook restored',
