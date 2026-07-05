@@ -2,9 +2,9 @@
 
 A web panel for managing your [TF2Autobot](https://github.com/TF2Autobot/tf2autobot) trading bot. Add and edit pricelist items, compare your prices against backpack.tf, review trades, tune bot settings, and track profit — all from your browser.
 
-**Current version:** 3.3.3
+**Current version:** 3.4.0
 
-![License](https://img.shields.io/badge/license-ISC-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-green.svg)
 
 ---
@@ -53,6 +53,8 @@ Open **http://localhost:3000** (or the port you set in `.env`).
 On Linux you can also use `./start.sh`. On Windows, run `start.bat` after building.
 
 For a full walkthrough — bot setup, IPC, first login, and troubleshooting — see **[TUTORIAL.md](TUTORIAL.md)**.
+
+Latest release: [v3.4.0](https://github.com/gfghdg2233/tf2autobot-gui-panel/releases/tag/v3.4.0)
 
 ---
 
@@ -152,4 +154,4 @@ Uses [TF2Autobot](https://github.com/TF2Autobot/tf2autobot), [@tf2autobot/tf2-sc
 
 ## License
 
-ISC — see [LICENSE.txt](LICENSE.txt).
+MIT — see [LICENSE.txt](LICENSE.txt).
