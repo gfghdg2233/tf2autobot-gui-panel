@@ -7,6 +7,17 @@ export interface UpdateLogEntry {
 
 export const UPDATE_LOGS: UpdateLogEntry[] = [
 	{
+		version: '3.4.3',
+		date: '2026-07-05',
+		title: 'Vertical sidebar navigation',
+		changes: [
+			'Replaced top header nav with a fixed left sidebar (icon + label links)',
+			'Active page highlights with orange accent, similar to backpack.tf-style panels',
+			'Theme picker and Settings moved to the sidebar footer',
+			'Mobile hamburger menu with slide-out drawer and overlay'
+		]
+	},
+	{
 		version: '3.4.0',
 		date: '2026-07-05',
 		title: 'Theme selector and color palettes',
