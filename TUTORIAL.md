@@ -312,6 +312,7 @@ Restart the bot as well if IPC message formats changed between versions.
 ## Need more help?
 
 - Bot issues: [TF2Autobot wiki / issues](https://github.com/TF2Autobot/tf2autobot)
-- GUI fork: [gfghdg2233/tf2autobot-gui-panel](https://github.com/gfghdg2233/tf2autobot-gui-panel/issues)
+- GUI panel: [uwu6967/tf2autobot-gui-panel](https://github.com/uwu6967/tf2autobot-gui-panel/issues)
+- Recommended bot: [uwu6967/tf2autobot-pricedb](https://github.com/uwu6967/tf2autobot-pricedb/issues)
 
 Happy trading!
