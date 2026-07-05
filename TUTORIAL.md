@@ -10,7 +10,7 @@ This guide walks you through installing the web panel, connecting it to your TF2
 
 You need **two separate programs**:
 
-1. **TF2Autobot** — the Steam trading bot (runs `node dist/app.js`)
+1. **TF2Autobot** — the Steam trading bot (runs `node dist/app.js`). **Recommended:** [**tf2autobot-pricedb**](https://github.com/uwu6967/tf2autobot-pricedb)
 2. **This GUI panel** — the website you open in a browser (runs `node dist/server/index.js`)
 
 The panel reads and writes your bot’s pricelist and settings. It does not replace the bot.
@@ -32,7 +32,7 @@ npm -v
 ## Step 2 — Clone and build the GUI
 
 ```bash
-git clone https://github.com/gfghdg2233/tf2autobot-gui-panel.git
+git clone https://github.com/uwu6967/tf2autobot-gui-panel.git
 cd tf2autobot-gui-panel
 npm install
 npm run build
@@ -85,7 +85,17 @@ Only do this on a trusted local setup. Anyone who can reach the port can manage 
 
 If you do not already have a bot running:
 
-1. Clone and build [TF2Autobot](https://github.com/TF2Autobot/tf2autobot) (or your PriceDB fork) into a folder **next to** or **anywhere on the server**.
+1. Clone and build [**tf2autobot-pricedb**](https://github.com/uwu6967/tf2autobot-pricedb) (recommended for this panel) into a folder **next to** or **anywhere on the server**:
+
+```bash
+git clone https://github.com/uwu6967/tf2autobot-pricedb.git
+cd tf2autobot-pricedb
+npm install
+npm run build
+```
+
+The upstream [TF2Autobot](https://github.com/TF2Autobot/tf2autobot) repo also works, but **tf2autobot-pricedb** is what this GUI is tested against for pricedb.io pricing and IPC.
+
 2. Create the bot `.env` with your Steam credentials:
 
 ```env
@@ -103,7 +113,7 @@ ENABLE_SOCKET=true
 4. Build and start the bot:
 
 ```bash
-cd /path/to/tf2autobot
+cd /path/to/tf2autobot-pricedb
 npm install
 npm run build
 node dist/app.js
