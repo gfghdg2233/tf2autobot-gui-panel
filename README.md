@@ -4,7 +4,7 @@ A web panel for managing your [TF2Autobot](https://github.com/TF2Autobot/tf2auto
 
 > **Recommended bot:** Use [**tf2autobot-pricedb**](https://github.com/uwu6967/tf2autobot-pricedb) with this panel. It is the tested fork for live pricedb.io prices, IPC, and the optional junk-deletion patches documented in this repo.
 
-**Current version:** 3.4.0
+**Current version:** 3.4.1
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-green.svg)
@@ -13,6 +13,7 @@ A web panel for managing your [TF2Autobot](https://github.com/TF2Autobot/tf2auto
 
 ## Features
 
+- **Discord update webhook** — optional Mann Co. styled embed when a new GUI version starts (see `DISCORD_WEBHOOK_URL`)
 - **Theme selector** — 11 color palettes (Mann Co., BLU, RED, Australium, Neon, and more); saved in your browser
 - **Pricelist management** — search, filter, grid/list views, bulk add, manual and autopriced items
 - **Live backpack.tf prices** — reference buy/sell prices from [pricedb.io](https://pricedb.io), auto-refresh, and a “differs from bptf” filter
@@ -56,7 +57,7 @@ On Linux you can also use `./start.sh`. On Windows, run `start.bat` after buildi
 
 For a full walkthrough — bot setup, IPC, first login, and troubleshooting — see **[TUTORIAL.md](TUTORIAL.md)**.
 
-Latest release: [v3.4.0](https://github.com/uwu6967/tf2autobot-gui-panel/releases/tag/v3.4.0)
+Latest release: [v3.4.1](https://github.com/uwu6967/tf2autobot-gui-panel/releases/tag/v3.4.1)
 
 ---
 
@@ -76,8 +77,15 @@ Copy `template.env` to `.env`. Never commit `.env`.
 | `VPS` | `false` | Set `true` on a public server |
 | `ADDRESS` | `localhost` | Public hostname/IP when `VPS=true` |
 | `SESSION_SECRET` | — | Random string for express sessions |
+| `DISCORD_WEBHOOK_URL` | *(empty)* | Optional webhook URL for version update embeds |
+| `DISCORD_WEBHOOK_ENABLED` | `true` | Enable/disable Discord update posts |
+| `DISCORD_WEBHOOK_ALWAYS` | `false` | Post on every startup instead of once per version |
 
 Bot Steam credentials (`STEAM_PASSWORD`, shared secrets, etc.) belong in the **bot’s** `.env`, not the GUI `.env`.
+
+### Discord update webhook
+
+Add a Discord webhook URL to `.env` to announce new GUI versions in your server. The panel sends a **Mann Co. styled embed** once per version when it starts (or run `npm run notify-discord -- --force` manually after releases). Preview the embed on the **Update Logs** page in the panel.
 
 ---
 

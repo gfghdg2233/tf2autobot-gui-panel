@@ -8,7 +8,7 @@
         <div>
             <p class="eyebrow mb-1">Release Notes</p>
             <h1 class="mb-1">Update Logs</h1>
-            <p>Every GUI update is recorded here. Check back after each release.</p>
+            <p>Every GUI update is recorded here. The latest release is also shown below in Discord webhook style.</p>
         </div>
 
         <div class="settings-hero-meta">
@@ -16,6 +16,47 @@
             <span>latest v{{ logs[0].version if logs.length > 0 else guiVersion }}</span>
         </div>
     </div>
+
+    {% if discordPreview %}
+    <section class="discord-preview-panel glass-panel mb-4" aria-label="Discord webhook preview">
+        <div class="discord-preview-header-bar">
+            <span>Discord Webhook Preview</span>
+            <small>What your update channel sees when a new version is announced</small>
+        </div>
+
+        <div class="discord-preview-message">
+            <div class="discord-preview-author">
+                <div class="discord-preview-avatar" aria-hidden="true">TF2</div>
+                <div class="discord-preview-meta">
+                    <span class="discord-preview-name">{{ discordPreview.username }}</span>
+                    <span class="discord-preview-badge">BOT</span>
+                    <span class="discord-preview-time">{{ discordPreview.dateLabel }}</span>
+                </div>
+            </div>
+
+            <div class="discord-preview-embed">
+                <div class="discord-preview-accent" aria-hidden="true"></div>
+                <div class="discord-preview-body">
+                    <strong class="discord-preview-title">{{ discordPreview.title }}</strong>
+                    {% if discordPreview.description %}
+                    <p class="discord-preview-description">{{ discordPreview.description }}</p>
+                    {% endif %}
+
+                    {% for field in discordPreview.fields %}
+                    <div class="discord-preview-field{% if field.inline %} discord-preview-field-inline{% endif %}">
+                        <span class="discord-preview-field-name">{{ field.name }}</span>
+                        <div class="discord-preview-field-value">{{ field.value | safe }}</div>
+                    </div>
+                    {% endfor %}
+
+                    {% if discordPreview.footer %}
+                    <div class="discord-preview-footer">{{ discordPreview.footer }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
 
     <div class="update-log-list">
         {% for log in logs %}
