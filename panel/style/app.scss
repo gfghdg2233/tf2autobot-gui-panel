@@ -1,30 +1,6 @@
+@import "themes";
 @import "custom";
 @import "~bootstrap/scss/bootstrap";
-
-:root {
-    --tf2-bg: #1a1714;
-    --tf2-bg-deep: #110f0d;
-    --tf2-panel: #2b2622;
-    --tf2-panel-light: #3d3630;
-    --tf2-panel-dark: #1f1b18;
-    --tf2-orange: #c47020;
-    --tf2-orange-bright: #e8a028;
-    --tf2-orange-dark: #8a4a10;
-    --tf2-cream: #d4c4a8;
-    --tf2-text: #ece5d8;
-    --tf2-text-muted: #a89880;
-    --tf2-border-light: #6b5d4f;
-    --tf2-border-dark: #14110f;
-    --tf2-red: #9c3428;
-    --tf2-red-bright: #c54b4b;
-    --tf2-blu: #2d5a8a;
-    --tf2-blu-bright: #4a90d9;
-    --tf2-green: #5a8c3a;
-    --tf2-green-bright: #7cb356;
-    --tf2-bevel-light: #6b5d4f;
-    --tf2-bevel-dark: #14110f;
-    --tf2-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
-}
 
 * {
     scrollbar-width: thin;
@@ -36,9 +12,9 @@ body,
     min-height: 100vh;
     margin: 0;
     background:
-        radial-gradient(circle at 15% 0%, rgba(196, 112, 32, 0.14), transparent 28rem),
-        radial-gradient(circle at 85% 10%, rgba(45, 90, 138, 0.1), transparent 24rem),
-        linear-gradient(180deg, #221e1a 0%, var(--tf2-bg) 40%, var(--tf2-bg-deep) 100%);
+        radial-gradient(circle at 15% 0%, var(--tf2-glow-1), transparent 28rem),
+        radial-gradient(circle at 85% 10%, var(--tf2-glow-2), transparent 24rem),
+        linear-gradient(180deg, var(--tf2-body-mid) 0%, var(--tf2-bg) 40%, var(--tf2-bg-deep) 100%);
     color: var(--tf2-text);
     font-family: "Roboto Condensed", "Segoe UI", sans-serif;
 }
@@ -106,7 +82,7 @@ small {
 .tf2-header {
     border-bottom: 3px solid var(--tf2-border-dark);
     background:
-        linear-gradient(180deg, #f0b040 0%, #e8a028 18%, #c47020 55%, #8a4a10 100%);
+        linear-gradient(180deg, var(--tf2-header-1) 0%, var(--tf2-header-2) 18%, var(--tf2-header-3) 55%, var(--tf2-header-4) 100%);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), var(--tf2-shadow);
 }
 
@@ -124,7 +100,7 @@ small {
     display: inline-flex;
     align-items: center;
     gap: 0.85rem;
-    color: #1a1008;
+    color: var(--tf2-header-fg);
 }
 
 .tf2-brand-badge {
@@ -150,13 +126,13 @@ small {
 }
 
 .tf2-brand-text strong {
-    color: #1a1008;
+    color: var(--tf2-header-fg);
     font-size: clamp(1.2rem, 2.5vw, 1.65rem);
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
 .tf2-brand-text small {
-    color: rgba(26, 16, 8, 0.78) !important;
+    color: var(--tf2-header-fg-muted) !important;
     font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.12em;
@@ -167,7 +143,7 @@ small {
     padding: 0.35rem 0.75rem;
     background: rgba(20, 17, 15, 0.28);
     border: 2px solid rgba(20, 17, 15, 0.45);
-    color: #1a1008;
+    color: var(--tf2-header-fg);
     font-family: "Oswald", sans-serif;
     font-weight: 600;
     letter-spacing: 0.08em;
@@ -175,7 +151,7 @@ small {
 }
 
 .tf2-nav {
-    background: linear-gradient(180deg, #3d3630 0%, #2b2622 100%);
+    background: linear-gradient(180deg, var(--tf2-nav-1) 0%, var(--tf2-nav-2) 100%);
     border-bottom: 3px solid var(--tf2-border-dark);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
@@ -209,13 +185,13 @@ small {
 .tf2-nav-link:hover,
 .tf2-nav-link:focus {
     color: #fff;
-    background: rgba(196, 112, 32, 0.18);
+    background: var(--tf2-nav-hover);
 }
 
 .tf2-nav-link.active {
-    color: #1a1008;
-    background: linear-gradient(180deg, #f0b040 0%, #e8a028 45%, #c47020 100%);
-    border-color: #f0c060 #6a3810 #6a3810 #f0c060;
+    color: var(--tf2-header-fg);
+    background: linear-gradient(180deg, var(--tf2-header-1) 0%, var(--tf2-header-2) 45%, var(--tf2-header-3) 100%);
+    border-color: var(--tf2-header-1) var(--tf2-header-4) var(--tf2-header-4) var(--tf2-header-1);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
     transform: translateY(2px);
 }
@@ -444,10 +420,10 @@ textarea {
 .form-control:focus,
 .form-select:focus,
 textarea:focus {
-    background: #252019;
+    background: var(--tf2-input-focus-bg);
     color: #fff;
     border-color: var(--tf2-orange-bright) var(--tf2-orange-dark) var(--tf2-orange-dark) var(--tf2-orange-bright);
-    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35), 0 0 0 2px rgba(232, 160, 40, 0.25);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35), 0 0 0 2px var(--tf2-focus-ring);
 }
 
 .form-control::placeholder {
@@ -496,7 +472,7 @@ textarea:focus {
 }
 
 .table tbody tr:hover {
-    background: rgba(196, 112, 32, 0.1);
+    background: var(--tf2-table-hover);
 }
 
 /* ── Modals / alerts ── */
@@ -510,13 +486,13 @@ textarea:focus {
 }
 
 .modal-header {
-    background: linear-gradient(180deg, #f0b040 0%, #c47020 100%);
+    background: linear-gradient(180deg, var(--tf2-header-1) 0%, var(--tf2-header-3) 100%);
     border-bottom: 2px solid var(--tf2-border-dark);
-    color: #1a1008;
+    color: var(--tf2-header-fg);
 }
 
 .modal-header .modal-title {
-    color: #1a1008;
+    color: var(--tf2-header-fg);
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 

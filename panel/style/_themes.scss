@@ -1,0 +1,282 @@
+// Theme color palettes — applied via [data-theme] on <html>
+
+@mixin theme-palette(
+    $bg,
+    $bg-deep,
+    $panel,
+    $panel-light,
+    $panel-dark,
+    $accent,
+    $accent-bright,
+    $accent-dark,
+    $cream,
+    $text,
+    $text-muted,
+    $border-light,
+    $border-dark,
+    $red,
+    $red-bright,
+    $blu,
+    $blu-bright,
+    $green,
+    $green-bright,
+    $header-1,
+    $header-2,
+    $header-3,
+    $header-4,
+    $header-fg,
+    $header-fg-muted,
+    $nav-1,
+    $nav-2,
+    $body-mid,
+    $glow-1,
+    $glow-2
+) {
+    --tf2-bg: #{$bg};
+    --tf2-bg-deep: #{$bg-deep};
+    --tf2-panel: #{$panel};
+    --tf2-panel-light: #{$panel-light};
+    --tf2-panel-dark: #{$panel-dark};
+    --tf2-orange: #{$accent};
+    --tf2-orange-bright: #{$accent-bright};
+    --tf2-orange-dark: #{$accent-dark};
+    --tf2-cream: #{$cream};
+    --tf2-text: #{$text};
+    --tf2-text-muted: #{$text-muted};
+    --tf2-border-light: #{$border-light};
+    --tf2-border-dark: #{$border-dark};
+    --tf2-red: #{$red};
+    --tf2-red-bright: #{$red-bright};
+    --tf2-blu: #{$blu};
+    --tf2-blu-bright: #{$blu-bright};
+    --tf2-green: #{$green};
+    --tf2-green-bright: #{$green-bright};
+    --tf2-bevel-light: #{$border-light};
+    --tf2-bevel-dark: #{$border-dark};
+    --tf2-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+    --tf2-header-1: #{$header-1};
+    --tf2-header-2: #{$header-2};
+    --tf2-header-3: #{$header-3};
+    --tf2-header-4: #{$header-4};
+    --tf2-header-fg: #{$header-fg};
+    --tf2-header-fg-muted: #{$header-fg-muted};
+    --tf2-nav-1: #{$nav-1};
+    --tf2-nav-2: #{$nav-2};
+    --tf2-body-mid: #{$body-mid};
+    --tf2-glow-1: #{$glow-1};
+    --tf2-glow-2: #{$glow-2};
+    --tf2-nav-hover: #{rgba($accent, 0.18)};
+    --tf2-table-hover: #{rgba($accent, 0.1)};
+    --tf2-focus-ring: #{rgba($accent-bright, 0.25)};
+    --tf2-input-focus-bg: #{mix($panel-dark, $accent, 88%)};
+}
+
+:root,
+[data-theme="mann-co"] {
+    @include theme-palette(
+        #1a1714, #110f0d, #2b2622, #3d3630, #1f1b18,
+        #c47020, #e8a028, #8a4a10,
+        #d4c4a8, #ece5d8, #a89880, #6b5d4f, #14110f,
+        #9c3428, #c54b4b, #2d5a8a, #4a90d9, #5a8c3a, #7cb356,
+        #f0b040, #e8a028, #c47020, #8a4a10,
+        #1a1008, rgba(26, 16, 8, 0.78),
+        #3d3630, #2b2622, #221e1a,
+        rgba(196, 112, 32, 0.14), rgba(45, 90, 138, 0.1)
+    );
+}
+
+[data-theme="blu-base"] {
+    @include theme-palette(
+        #101820, #0a1018, #1a2a38, #243848, #121e28,
+        #3d8fd9, #6eb5f0, #1e5a8a,
+        #b8d4ec, #e4f0fa, #7a9ab8, #4a6a88, #0a1018,
+        #9c3428, #d06050, #2d5a8a, #5aa0e0, #4a8c5a, #6cb878,
+        #5aa0e0, #4a90d9, #2d6aaa, #1a4a78,
+        #0a1420, rgba(10, 20, 32, 0.78),
+        #243848, #1a2a38, #142030,
+        rgba(61, 143, 217, 0.16), rgba(45, 90, 138, 0.12)
+    );
+}
+
+[data-theme="red-fortress"] {
+    @include theme-palette(
+        #1a1010, #100a0a, #2e1a1a, #3e2424, #1a1010,
+        #c43828, #e85848, #8a2018,
+        #e8c8c0, #f5e8e4, #a88880, #6a4848, #100808,
+        #9c2820, #d05040, #4a3030, #7a5050, #5a8c3a, #7cb356,
+        #e85848, #d04030, #a82820, #781810,
+        #1a0808, rgba(26, 8, 8, 0.78),
+        #3e2424, #2e1a1a, #201010,
+        rgba(196, 56, 40, 0.16), rgba(120, 24, 16, 0.12)
+    );
+}
+
+[data-theme="australium"] {
+    @include theme-palette(
+        #1a1610, #100e08, #2e2818, #3e3824, #1a1610,
+        #d4a020, #f0c848, #9a7010,
+        #f0e0b0, #faf0d8, #b0a080, #7a6848, #100c08,
+        #9c3428, #c54b4b, #6a5830, #9a8040, #6a9a3a, #8cb850,
+        #f0c848, #e0b030, #c08818, #886010,
+        #1a1408, rgba(26, 20, 8, 0.78),
+        #3e3824, #2e2818, #221c10,
+        rgba(212, 160, 32, 0.18), rgba(154, 112, 16, 0.12)
+    );
+}
+
+[data-theme="neon-grid"] {
+    @include theme-palette(
+        #0a0e14, #060810, #121820, #1a2430, #0c1018,
+        #00d4c8, #40f0e8, #008880,
+        #c0f0ec, #e8faf8, #608890, #304050, #040608,
+        #e040a0, #f060c0, #4060d0, #6088f0, #40c080, #60e0a0,
+        #40f0e8, #00d4c8, #00a8a0, #007870,
+        #041018, rgba(4, 16, 24, 0.82),
+        #1a2430, #121820, #0c1218,
+        rgba(0, 212, 200, 0.14), rgba(224, 64, 160, 0.1)
+    );
+}
+
+[data-theme="forest-camo"] {
+    @include theme-palette(
+        #101810, #0a100a, #1e2a1e, #2a3828, #121a12,
+        #6a9a40, #8cb858, #4a7028,
+        #c8d8b8, #e8f0e0, #88a078, #506848, #080c08,
+        #9c3428, #c06050, #3a5a30, #5a8048, #5a9a3a, #78b850,
+        #8cb858, #78a848, #5a8838, #3a6020,
+        #0a1408, rgba(10, 20, 8, 0.78),
+        #2a3828, #1e2a1e, #141c14,
+        rgba(106, 154, 64, 0.16), rgba(58, 96, 32, 0.1)
+    );
+}
+
+[data-theme="royal-purple"] {
+    @include theme-palette(
+        #14101a, #0c0810, #241c30, #322840, #161020,
+        #9a60d0, #b888f0, #6a3898,
+        #d8c8f0, #f0e8fa, #9888a8, #584868, #080610,
+        #c05070, #e07090, #5040a0, #7060c8, #60a060, #80c080,
+        #b888f0, #9a60d0, #7848a8, #503070,
+        #100818, rgba(16, 8, 24, 0.78),
+        #322840, #241c30, #1a1424,
+        rgba(154, 96, 208, 0.16), rgba(80, 48, 112, 0.12)
+    );
+}
+
+[data-theme="ocean-depth"] {
+    @include theme-palette(
+        #081018, #040810, #102030, #183040, #0a1420,
+        #28a8c8, #48d0f0, #187888,
+        #b8e0f0, #e0f4fa, #6898a8, #385868, #020810,
+        #c05060, #e07080, #2060a0, #4088c8, #40a878, #60c898,
+        #48d0f0, #28a8c8, #1888a8, #106070,
+        #041018, rgba(4, 16, 24, 0.78),
+        #183040, #102030, #0c1824,
+        rgba(40, 168, 200, 0.16), rgba(32, 96, 160, 0.12)
+    );
+}
+
+[data-theme="crimson-night"] {
+    @include theme-palette(
+        #140a0c, #0c0608, #281418, #381c22, #160c10,
+        #d04058, #f06878, #901830,
+        #f0c8d0, #fae8ec, #a88088, #684048, #080406,
+        #c03040, #e05060, #602030, #904050, #60a050, #80c070,
+        #f06878, #d04058, #a82840, #781020,
+        #180608, rgba(24, 6, 8, 0.78),
+        #381c22, #281418, #1c1014,
+        rgba(208, 64, 88, 0.16), rgba(144, 24, 48, 0.12)
+    );
+}
+
+[data-theme="arctic-steel"] {
+    @include theme-palette(
+        #12161a, #0a0e12, #1e242a, #2a3238, #14181c,
+        #88a8c0, #a8c8e0, #587888,
+        #d0dce8, #ecf0f4, #8898a8, #506068, #060a0c,
+        #b06060, #d08080, #5070a0, #7098c8, #60a878, #80c898,
+        #a8c8e0, #88a8c0, #6888a8, #486878,
+        #0a1018, rgba(10, 16, 24, 0.78),
+        #2a3238, #1e242a, #181c20,
+        rgba(136, 168, 192, 0.14), rgba(80, 112, 160, 0.1)
+    );
+}
+
+[data-theme="sunset-harvest"] {
+    @include theme-palette(
+        #1a1210, #100c0a, #2a2018, #3a2c22, #1a1410,
+        #e87830, #f8a048, #b05018,
+        #f0d8c0, #faf0e4, #b09880, #786050, #0c0806,
+        #c04040, #e06060, #c06030, #e08848, #78a848, #98c868,
+        #f8a048, #e87830, #c86020, #984818,
+        #1a1008, rgba(26, 16, 8, 0.78),
+        #3a2c22, #2a2018, #201810,
+        rgba(232, 120, 48, 0.16), rgba(192, 96, 48, 0.12)
+    );
+}
+
+// Theme selector UI
+.tf2-header-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+}
+
+.tf2-theme-picker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.tf2-theme-picker label {
+    margin: 0;
+    color: var(--tf2-header-fg-muted);
+    font-family: "Oswald", sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.tf2-theme-select {
+    min-width: 9.5rem;
+    max-width: 12rem;
+    padding: 0.3rem 0.55rem;
+    font-family: "Roboto Condensed", sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--tf2-header-fg);
+    background: rgba(20, 17, 15, 0.35);
+    border: 2px solid rgba(20, 17, 15, 0.5);
+    border-radius: 0;
+    cursor: pointer;
+    appearance: auto;
+}
+
+.tf2-theme-select:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.35);
+    outline-offset: 1px;
+}
+
+.tf2-theme-select option {
+    color: #1a1714;
+    background: #ece5d8;
+}
+
+@media (max-width: 720px) {
+    .tf2-header-inner {
+        flex-wrap: wrap;
+    }
+
+    .tf2-header-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .tf2-theme-select {
+        min-width: 0;
+        flex: 1;
+    }
+}

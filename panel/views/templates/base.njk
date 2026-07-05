@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <title>{% block title %}TF2Autobot — Mann Co. Control Panel{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <script>
+        (function () {
+            try {
+                var key = 'tf2gui-theme';
+                var theme = localStorage.getItem(key) || 'mann-co';
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {}
+        })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Roboto+Condensed:wght@400;500;700&display=swap" rel="stylesheet">
@@ -22,7 +31,25 @@
                     <small>Mann Co. Trading Terminal</small>
                 </span>
             </a>
-            <div class="tf2-header-tag">v{{ guiVersion }}</div>
+            <div class="tf2-header-controls">
+                <div class="tf2-theme-picker">
+                    <label for="tf2-theme-select">Theme</label>
+                    <select id="tf2-theme-select" class="tf2-theme-select" aria-label="Color theme">
+                        <option value="mann-co">Mann Co. (Default)</option>
+                        <option value="blu-base">BLU Base</option>
+                        <option value="red-fortress">RED Fortress</option>
+                        <option value="australium">Australium Gold</option>
+                        <option value="neon-grid">Neon Grid</option>
+                        <option value="forest-camo">Forest Camo</option>
+                        <option value="royal-purple">Royal Purple</option>
+                        <option value="ocean-depth">Ocean Depth</option>
+                        <option value="crimson-night">Crimson Night</option>
+                        <option value="arctic-steel">Arctic Steel</option>
+                        <option value="sunset-harvest">Sunset Harvest</option>
+                    </select>
+                </div>
+                <div class="tf2-header-tag">v{{ guiVersion }}</div>
+            </div>
         </div>
     </header>
 
