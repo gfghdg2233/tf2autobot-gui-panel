@@ -22,71 +22,88 @@
 </head>
 <body class="tf2-body">
 <div class="tf2-shell">
-    <header class="tf2-header">
-        <div class="tf2-header-inner">
-            <a class="tf2-brand" href="/">
-                <span class="tf2-brand-badge">TF2</span>
-                <span class="tf2-brand-text">
-                    <strong>AUTOBOT</strong>
-                    <small>Mann Co. Trading Terminal</small>
+    <button type="button" class="tf2-sidebar-toggle" id="tf2-sidebar-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <aside class="tf2-sidebar" id="tf2-sidebar" aria-label="Main navigation">
+        <a class="tf2-sidebar-brand" href="/">
+            <span class="tf2-sidebar-brand-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10.5z"/></svg>
+            </span>
+            <span class="tf2-sidebar-brand-text">
+                <strong>TF2Autobot</strong>
+                <small>Mann Co. Panel</small>
+            </span>
+        </a>
+
+        <nav class="tf2-sidebar-nav">
+            <a href="/" class="tf2-sidebar-link" data-nav>
+                <span class="tf2-sidebar-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
                 </span>
+                <span class="tf2-sidebar-label">Pricelist</span>
             </a>
-            <div class="tf2-header-controls">
-                <div class="tf2-theme-picker">
-                    <label for="tf2-theme-select">Theme</label>
-                    <select id="tf2-theme-select" class="tf2-theme-select" aria-label="Color theme">
-                        <option value="mann-co">Mann Co. (Default)</option>
-                        <option value="blu-base">BLU Base</option>
-                        <option value="red-fortress">RED Fortress</option>
-                        <option value="australium">Australium Gold</option>
-                        <option value="neon-grid">Neon Grid</option>
-                        <option value="forest-camo">Forest Camo</option>
-                        <option value="royal-purple">Royal Purple</option>
-                        <option value="ocean-depth">Ocean Depth</option>
-                        <option value="crimson-night">Crimson Night</option>
-                        <option value="arctic-steel">Arctic Steel</option>
-                        <option value="sunset-harvest">Sunset Harvest</option>
-                    </select>
-                </div>
-                <div class="tf2-header-tag">v{{ guiVersion }}</div>
+            <a href="/trades" class="tf2-sidebar-link" data-nav>
+                <span class="tf2-sidebar-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                </span>
+                <span class="tf2-sidebar-label">Trades</span>
+            </a>
+            <a href="/profit" class="tf2-sidebar-link" data-nav>
+                <span class="tf2-sidebar-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                </span>
+                <span class="tf2-sidebar-label">Profit</span>
+            </a>
+            <a href="/updates" class="tf2-sidebar-link" data-nav>
+                <span class="tf2-sidebar-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </span>
+                <span class="tf2-sidebar-label">Update Logs</span>
+            </a>
+        </nav>
+
+        <div class="tf2-sidebar-bottom">
+            <div class="tf2-sidebar-theme">
+                <label for="tf2-theme-select">Theme</label>
+                <select id="tf2-theme-select" class="tf2-theme-select" aria-label="Color theme">
+                    <option value="mann-co">Mann Co.</option>
+                    <option value="blu-base">BLU Base</option>
+                    <option value="red-fortress">RED Fortress</option>
+                    <option value="australium">Australium</option>
+                    <option value="neon-grid">Neon Grid</option>
+                    <option value="forest-camo">Forest Camo</option>
+                    <option value="royal-purple">Royal Purple</option>
+                    <option value="ocean-depth">Ocean Depth</option>
+                    <option value="crimson-night">Crimson Night</option>
+                    <option value="arctic-steel">Arctic Steel</option>
+                    <option value="sunset-harvest">Sunset Harvest</option>
+                </select>
             </div>
+            <a href="/config" class="tf2-sidebar-link" data-nav>
+                <span class="tf2-sidebar-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </span>
+                <span class="tf2-sidebar-label">Settings</span>
+            </a>
+            <div class="tf2-sidebar-version">v{{ guiVersion }}</div>
         </div>
-    </header>
+    </aside>
 
-    <nav class="tf2-nav" aria-label="Main navigation">
-        <div class="tf2-nav-inner">
-            <a href="/" class="tf2-nav-link" data-nav>
-                <span class="tf2-nav-icon">&#9876;</span>
-                Pricelist
-            </a>
-            <a href="/trades" class="tf2-nav-link" data-nav>
-                <span class="tf2-nav-icon">&#8644;</span>
-                Trades
-            </a>
-            <a href="/profit" class="tf2-nav-link" data-nav>
-                <span class="tf2-nav-icon">&#9733;</span>
-                Profit
-            </a>
-            <a href="/config" class="tf2-nav-link" data-nav>
-                <span class="tf2-nav-icon">&#9881;</span>
-                Settings
-            </a>
-            <a href="/updates" class="tf2-nav-link" data-nav>
-                <span class="tf2-nav-icon">&#128196;</span>
-                Update Logs
-            </a>
-        </div>
-    </nav>
+    <div class="tf2-content-wrap">
+        <main class="app-root tf2-main" id="app">
+            {% block body %}{% endblock %}
+        </main>
 
-    <main class="app-root tf2-main" id="app">
-        {% block body %}{% endblock %}
-    </main>
-
-    <footer class="tf2-footer">
-        <span>TF2Autobot GUI</span>
-        <span class="tf2-footer-dot">&bull;</span>
-        <span>Mann Co. approved*</span>
-    </footer>
+        <footer class="tf2-footer">
+            <span>TF2Autobot GUI</span>
+            <span class="tf2-footer-dot">&bull;</span>
+            <span>Mann Co. approved*</span>
+        </footer>
+    </div>
 </div>
 {% block javascripts %}{% endblock %}
 </body>

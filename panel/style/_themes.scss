@@ -223,15 +223,19 @@
     flex-wrap: wrap;
 }
 
-.tf2-theme-picker {
+.tf2-theme-picker,
+.tf2-sidebar-theme {
     display: inline-flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
     gap: 0.4rem;
+    width: 100%;
 }
 
-.tf2-theme-picker label {
+.tf2-theme-picker label,
+.tf2-sidebar-theme label {
     margin: 0;
-    color: var(--tf2-header-fg-muted);
+    color: var(--tf2-text-muted);
     font-family: "Oswald", sans-serif;
     font-size: 0.72rem;
     font-weight: 600;
@@ -241,42 +245,27 @@
 }
 
 .tf2-theme-select {
-    min-width: 9.5rem;
-    max-width: 12rem;
-    padding: 0.3rem 0.55rem;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    padding: 0.35rem 0.55rem;
     font-family: "Roboto Condensed", sans-serif;
     font-size: 0.82rem;
     font-weight: 600;
-    color: var(--tf2-header-fg);
-    background: rgba(20, 17, 15, 0.35);
-    border: 2px solid rgba(20, 17, 15, 0.5);
-    border-radius: 0;
+    color: var(--tf2-text);
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0.35rem;
     cursor: pointer;
     appearance: auto;
 }
 
 .tf2-theme-select:focus {
-    outline: 2px solid rgba(255, 255, 255, 0.35);
+    outline: 2px solid var(--tf2-focus-ring);
     outline-offset: 1px;
 }
 
 .tf2-theme-select option {
     color: #1a1714;
     background: #ece5d8;
-}
-
-@media (max-width: 720px) {
-    .tf2-header-inner {
-        flex-wrap: wrap;
-    }
-
-    .tf2-header-controls {
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .tf2-theme-select {
-        min-width: 0;
-        flex: 1;
-    }
 }
