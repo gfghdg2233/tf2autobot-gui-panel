@@ -7,27 +7,6 @@ export interface UpdateLogEntry {
 
 export const UPDATE_LOGS: UpdateLogEntry[] = [
 	{
-		version: '3.4.2',
-		date: '2026-07-05',
-		title: 'Trade Discord webhook preview and docs',
-		changes: [
-			'Trades page shows a Discord-style preview matching tf2autobot-pricedb trade-summary embeds',
-			'Documented bot trade webhook setup in patches/tf2autobot/DISCORD_WEBHOOKS.md',
-			'Clarified difference between bot trade webhooks (Settings) and GUI version webhooks (.env)'
-		]
-	},
-	{
-		version: '3.4.1',
-		date: '2026-07-05',
-		title: 'Discord update webhook restored',
-		changes: [
-			'Restored Mann Co. styled Discord webhook embeds for GUI version updates',
-			'Optional DISCORD_WEBHOOK_URL posts once per new version on panel startup',
-			'npm run notify-discord command for manual release announcements',
-			'Update Logs page now shows a Discord-style preview of the latest release embed'
-		]
-	},
-	{
 		version: '3.4.0',
 		date: '2026-07-05',
 		title: 'Theme selector and color palettes',
@@ -81,8 +60,4 @@ export function getLatestStartupLines(limit = 5): string[] {
 	}
 
 	return latest.changes.slice(0, limit);
-}
-
-export function getLatestUpdateLog(): UpdateLogEntry | undefined {
-	return UPDATE_LOGS[0];
 }

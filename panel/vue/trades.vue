@@ -13,46 +13,6 @@
             </div>
         </div>
 
-        <section class="discord-preview-panel glass-panel mb-4 discord-preview-panel--trade" aria-label="Discord trade webhook preview">
-            <div class="discord-preview-header-bar">
-                <span>Discord Trade Webhook Preview</span>
-                <small>Sent by <strong>tf2autobot-pricedb</strong> when a trade is accepted or countered — configure URLs in <a href="/config">Settings → Discord Webhook</a></small>
-            </div>
-
-            <div class="discord-preview-message">
-                <div class="discord-preview-author">
-                    <div class="discord-preview-avatar discord-preview-avatar--trade" aria-hidden="true">TF2</div>
-                    <div class="discord-preview-meta">
-                        <span class="discord-preview-name">{{ tradeDiscordPreview.username }}</span>
-                        <span class="discord-preview-badge">APP</span>
-                    </div>
-                </div>
-
-                <div class="discord-preview-embed">
-                    <div class="discord-preview-accent discord-preview-accent--trade" aria-hidden="true"></div>
-                    <div class="discord-preview-body">
-                        <div class="discord-preview-trade-author">
-                            <span class="discord-preview-trade-author-icon" aria-hidden="true"></span>
-                            <strong>{{ tradeDiscordPreview.authorName }}</strong>
-                        </div>
-
-                        <div class="discord-preview-description" v-html="formatPreviewText(tradeDiscordPreview.description)"></div>
-
-                        <div
-                            v-for="(field, index) in tradeDiscordPreview.fields"
-                            :key="index"
-                            class="discord-preview-field"
-                        >
-                            <span class="discord-preview-field-name" v-html="formatPreviewText(field.name)"></span>
-                            <div class="discord-preview-field-value" v-html="formatPreviewText(field.value)"></div>
-                        </div>
-
-                        <div class="discord-preview-footer">{{ tradeDiscordPreview.footer }}</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <div class="glass-panel mb-4 trade-filters">
             <div class="row g-3 align-items-end">
                 <div class="col-lg-6">
@@ -133,7 +93,6 @@
 
 <script lang="ts">
 import gridItem from './components/gridItem.vue';
-import { DISCORD_TRADE_PREVIEW_SAMPLE } from '../data/discordTradePreview';
 
 export default {
     name: 'trades.vue',
@@ -147,21 +106,13 @@ export default {
             order: 1,
             acceptedOnly: 0,
             tradeCount: 0,
-            loadLock: false,
-            tradeDiscordPreview: DISCORD_TRADE_PREVIEW_SAMPLE
+            loadLock: false
         };
     },
     components: {
         gridItem
     },
     methods: {
-        formatPreviewText(text: string): string {
-            return String(text || '')
-                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
-                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-                .replace(/\n/g, '<br>');
-        },
         loadTrades(first = 0, count = 50) {
             this.loadLock = true;
             fetch(`?first=${first}&count=${count}&dir=${this.order}&search=${encodeURIComponent(this.search)}&acceptedOnly=${this.acceptedOnly ? '1' : '0'}`, { headers: {

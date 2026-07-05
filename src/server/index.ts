@@ -12,7 +12,6 @@ import fs from "fs";
 import * as https from "https";
 import * as http from "http";
 import { printStartupLog } from './startupLog';
-import { notifyDiscordVersionUpdate } from './utils/discordWebhook';
 // import {Bot} from "./Bot";
 const port = +process.env.PORT;
 const portHttps = +process.env.PORT_HTTPS;
@@ -64,11 +63,7 @@ schemaManager.init(err => {
                 cert: fs.readFileSync(process.env.CERT_FILE || 'local.crt', 'utf8')
             };
             const httpsServer = https.createServer(credentials, app);
-            httpsServer.listen(portNginx || portHttps, portNginx ? "127.0.0.1" : undefined, () => {
-                const activePort = process.env.SSL === 'true' ? portHttps : port;
-                console.log(`server listening on port ${activePort}`);
-                void notifyDiscordVersionUpdate(pkg.version);
-            });
+            httpsServer.listen(portNginx || portHttps, portNginx ? "127.0.0.1" : undefined);
         } else {
             const httpServer = http.createServer(app);
             httpServer.on('error', (err: NodeJS.ErrnoException) => {
@@ -83,7 +78,6 @@ schemaManager.init(err => {
             httpServer.listen(port, () => {
                 console.log(`server listening on port ${port}`);
                 console.log(`Open http://localhost:${port} in your browser`);
-                void notifyDiscordVersionUpdate(pkg.version);
             });
         }
     }

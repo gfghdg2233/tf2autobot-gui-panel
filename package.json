@@ -1,6 +1,6 @@
 {
   "name": "tf2autobot-gui",
-  "version": "3.4.2",
+  "version": "3.4.0",
   "description": "An interface to easily manage your tf2autobot",
   "main": "dist/server/index.js",
   "scripts": {
@@ -10,7 +10,6 @@
     "build-back": "tsc -p ./src/server",
     "build-back-watch": "tsc -p ./src/server -w",
     "start": "node dist/server/index.js",
-    "notify-discord": "node dist/server/discordNotifyCli.js",
     "stop": "fuser -k 3001/tcp 2>/dev/null || fuser -k 3000/tcp 2>/dev/null || true",
     "lint": "eslint \"**/*.js\""
   },
