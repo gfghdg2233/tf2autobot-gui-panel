@@ -2,6 +2,8 @@
 
 A web panel for managing your [TF2Autobot](https://github.com/TF2Autobot/tf2autobot) trading bot. Add and edit pricelist items, compare your prices against backpack.tf, review trades, tune bot settings, and track profit — all from your browser.
 
+> **Recommended bot:** Use [**tf2autobot-pricedb**](https://github.com/uwu6967/tf2autobot-pricedb) with this panel. It is the tested fork for live pricedb.io prices, IPC, and the optional junk-deletion patches documented in this repo.
+
 **Current version:** 3.4.0
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
@@ -29,7 +31,7 @@ A web panel for managing your [TF2Autobot](https://github.com/TF2Autobot/tf2auto
 |-------------|--------|
 | **Node.js** | 18+ recommended (22 supported) |
 | **npm** | Comes with Node.js |
-| **TF2Autobot bot** | Must be running separately and connected via IPC |
+| **TF2Autobot bot** | Must be running separately and connected via IPC — [**tf2autobot-pricedb**](https://github.com/uwu6967/tf2autobot-pricedb) recommended |
 | **Steam Web API key** | Only if `STEAM_AUTH=true` |
 
 The GUI does **not** log into Steam or trade by itself. It talks to your bot over IPC while the bot handles Steam.
@@ -39,7 +41,7 @@ The GUI does **not** log into Steam or trade by itself. It talks to your bot ove
 ## Quick start
 
 ```bash
-git clone https://github.com/gfghdg2233/tf2autobot-gui-panel.git
+git clone https://github.com/uwu6967/tf2autobot-gui-panel.git
 cd tf2autobot-gui-panel
 npm install
 cp template.env .env
@@ -54,7 +56,7 @@ On Linux you can also use `./start.sh`. On Windows, run `start.bat` after buildi
 
 For a full walkthrough — bot setup, IPC, first login, and troubleshooting — see **[TUTORIAL.md](TUTORIAL.md)**.
 
-Latest release: [v3.4.0](https://github.com/gfghdg2233/tf2autobot-gui-panel/releases/tag/v3.4.0)
+Latest release: [v3.4.0](https://github.com/uwu6967/tf2autobot-gui-panel/releases/tag/v3.4.0)
 
 ---
 
@@ -92,7 +94,7 @@ Bot Steam credentials (`STEAM_PASSWORD`, shared secrets, etc.) belong in the **b
    You (admin)                          Trading & inventory
 ```
 
-1. Start your TF2Autobot bot with IPC enabled (`IPC=true` in the bot `.env`).
+1. Start your bot with IPC enabled (`IPC=true` in the bot `.env`). We recommend [**tf2autobot-pricedb**](https://github.com/uwu6967/tf2autobot-pricedb).
 2. Start this GUI panel.
 3. The bot registers over IPC; you pick it in the panel (or it auto-selects if there is only one).
 4. Bot data (pricelist, options, polldata) lives under `files/<steam-account>/`.
@@ -148,7 +150,7 @@ The `patches/tf2autobot/` folder documents fixes for untradable junk deletion in
 
 Based on [TF2Autobot GUI](https://github.com/TF2Autobot/tf2autobot-gui) by Zeus_Junior and contributors.
 
-Uses [TF2Autobot](https://github.com/TF2Autobot/tf2autobot), [@tf2autobot/tf2-schema](https://www.npmjs.com/package/@tf2autobot/tf2-schema), and [pricedb.io](https://pricedb.io) for reference prices.
+Uses [TF2Autobot](https://github.com/TF2Autobot/tf2autobot), the recommended [**tf2autobot-pricedb**](https://github.com/uwu6967/tf2autobot-pricedb) fork, [@tf2autobot/tf2-schema](https://www.npmjs.com/package/@tf2autobot/tf2-schema), and [pricedb.io](https://pricedb.io) for reference prices.
 
 ---
 
