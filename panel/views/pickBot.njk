@@ -1,0 +1,33 @@
+{% extends 'templates/base.njk' %}
+{% block stylesheets %}{% endblock %}
+{% block body %}
+<div class="container page-shell">
+    <div class="page-hero">
+        <div>
+            <p class="eyebrow mb-1">Bot Selection</p>
+            <h1 class="mb-1">Choose Your Bot</h1>
+            <p>Select which TF2Autobot instance this terminal should control.</p>
+        </div>
+    </div>
+
+    {% if bots | length > 0 %}
+    <div class="glass-panel tf2-picker-panel">
+        <form method="post" action="/pickbot" class="d-grid gap-3">
+            <div>
+                <label class="form-label" for="bot-select">Available bots</label>
+                <select name="bot" id="bot-select" class="form-select form-select-lg" required>
+                    <option value="" disabled selected>-- Select a bot --</option>
+                    {% for id, name in bots %}
+                        <option value="{{ id }}">{{ name }} ({{ id }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">Connect</button>
+        </form>
+    </div>
+    {% else %}
+    <div class="empty-state">No bots are currently available.</div>
+    {% endif %}
+</div>
+{% endblock %}
+{% block javascripts %}{% endblock %}

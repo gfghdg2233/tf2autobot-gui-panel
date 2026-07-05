@@ -1,0 +1,4 @@
+*.sh text eol=lf
+start.sh text eol=lf
+start-bot.sh text eol=lf
+setup-bot.sh text eol=lf

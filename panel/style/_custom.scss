@@ -1,0 +1,52 @@
+// TF2 / Mann Co. Bootstrap theme overrides
+
+$primary: #c47020;
+$secondary: #5c5348;
+$success: #5a8c3a;
+$danger: #9c3428;
+$warning: #e8a028;
+$info: #3d6a9e;
+
+$dark: #1a1714;
+$body-bg: #1a1714;
+$body-color: #ece5d8;
+
+$font-family-sans-serif: "Roboto Condensed", "Segoe UI", sans-serif;
+$headings-font-family: "Oswald", "Arial Narrow", sans-serif;
+
+$border-radius: 0;
+$border-radius-sm: 0;
+$border-radius-lg: 0;
+
+$card-bg: #2b2622;
+$card-border-color: #14110f;
+
+$table-bg: transparent;
+$table-color: #ece5d8;
+$table-border-color: rgba(0, 0, 0, 0.35);
+
+$input-bg: #1f1b18;
+$input-color: #ece5d8;
+$input-border-color: #14110f;
+
+$modal-content-bg: #2b2622;
+$modal-content-color: #ece5d8;
+$modal-content-border-color: #14110f;
+
+$dropdown-bg: #2b2622;
+$dropdown-color: #ece5d8;
+$dropdown-link-color: #ece5d8;
+$dropdown-link-hover-bg: rgba(196, 112, 32, 0.2);
+$dropdown-link-hover-color: #fff;
+
+$btn-border-radius: 0;
+$btn-border-radius-sm: 0;
+$btn-border-radius-lg: 0;
+
+$position-values: (
+    0: 0,
+    30: 30%,
+    50: 50%,
+    90: 90%,
+    100: 100%
+);

@@ -1,0 +1,61 @@
+{% extends 'templates/base.njk' %}
+
+{% block body %}
+<div class="container page-shell">
+    <div class="page-hero">
+        <div>
+            <p class="eyebrow mb-1">Mann Co. Analytics</p>
+            <h1 class="mb-1">Profit Report</h1>
+            <p>Track estimated profit from accepted trades and bot polldata.</p>
+        </div>
+
+        <form class="hero-actions" method="get" action="/profit">
+            <input class="form-control form-control-sm" style="width: 150px;" name="start" placeholder="Start unix" value="{{ query.start or '' }}">
+            <input class="form-control form-control-sm" style="width: 150px;" name="end" placeholder="End unix" value="{{ query.end or '' }}">
+            <select class="form-select form-select-sm" style="width: 150px;" name="interval">
+                <option value="-1">No interval</option>
+                <option value="3600">1 hour</option>
+                <option value="14400">4 hours</option>
+                <option value="43200">12 hours</option>
+                <option value="86400">1 day</option>
+            </select>
+            <button class="btn btn-primary btn-sm" type="submit">Update</button>
+        </form>
+    </div>
+
+    <div class="stat-grid mb-4">
+        <div class="stat-card stat-card-accent">
+            <span>Total Profit</span>
+            <strong>{{ profit.profitTotal }}</strong>
+        </div>
+
+        <div class="stat-card">
+            <span>Timeframe Profit</span>
+            <strong>{{ profit.profitTimed }}</strong>
+        </div>
+
+        <div class="stat-card">
+            <span>Accepted Trades</span>
+            <strong>{{ profit.numberOfTrades }}</strong>
+        </div>
+
+        <div class="stat-card">
+            <span>Overpay Profit</span>
+            <strong>{{ profit.overpriceProfit }}</strong>
+        </div>
+    </div>
+
+    <div class="glass-panel">
+        <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
+            <div>
+                <h2 class="h5 mb-1">Raw Data</h2>
+                <p class="text-muted mb-0">
+                    Profit is calculated from bot trade history. Key conversion may need live key-rate wiring later.
+                </p>
+            </div>
+
+            <a class="btn btn-outline-light btn-sm" href="/profit/json">View JSON</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
