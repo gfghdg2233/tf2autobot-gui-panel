@@ -1,0 +1,42 @@
+{% extends 'templates/base.njk' %}
+
+{% block title %}Update Logs — TF2Autobot{% endblock %}
+
+{% block body %}
+<div class="container page-shell">
+    <div class="page-hero">
+        <div>
+            <p class="eyebrow mb-1">Release Notes</p>
+            <h1 class="mb-1">Update Logs</h1>
+            <p>Every GUI update is recorded here. Check back after each release.</p>
+        </div>
+
+        <div class="settings-hero-meta">
+            <span>{{ logs.length }} releases</span>
+            <span>latest v{{ logs[0].version if logs.length > 0 else guiVersion }}</span>
+        </div>
+    </div>
+
+    <div class="update-log-list">
+        {% for log in logs %}
+        <article class="update-log-entry{% if loop.first %} update-log-entry-latest{% endif %}">
+            <header class="update-log-header">
+                <div>
+                    <span class="update-log-version">v{{ log.version }}</span>
+                    <h2 class="update-log-title">{{ log.title }}</h2>
+                </div>
+                <time class="update-log-date" datetime="{{ log.date }}">{{ log.date }}</time>
+            </header>
+
+            <ul class="update-log-changes">
+                {% for change in log.changes %}
+                <li>{{ change }}</li>
+                {% endfor %}
+            </ul>
+        </article>
+        {% else %}
+        <div class="empty-state">No update logs recorded yet.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

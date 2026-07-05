@@ -1,0 +1,15 @@
+node_modules
+.vscode
+config/*
+!config/paths.js
+.env
+/data
+dist
+public/build
+.DS_Store
+ecosystem.json
+files/
+schema.json
+local.key
+local.crt
+local.csr

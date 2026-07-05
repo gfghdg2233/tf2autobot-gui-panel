@@ -1,0 +1,14 @@
+node_modules/*
+*.bat
+*.md
+*.txt
+package.json
+package-lock.json
+
+# Client scripts
+*.min.js
+mdDateTimePicker.js
+scroll-into-view-if-needed.js
+
+dist
+public
