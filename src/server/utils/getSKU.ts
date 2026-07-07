@@ -1,6 +1,9 @@
 import { wear, wears, quality, qualities, effect, effects, killstreak, killstreaks, skin, skins } from '../data';
 import SKU from '@tf2autobot/tf2-sku';
 import fixItem from '../utils/fixItem';
+import { createLogger } from './logger';
+
+const log = createLogger('sku');
 
 /**
  * Generates a sku
@@ -155,7 +158,7 @@ export default function getSKU(search: string, schema): string {
 	}
 
 	if (defindex === false) {
-		console.log('Couldn\'t get defindex for item: ' + search);
+		log.debug(`Could not resolve defindex for item: ${search}`);
 		return null;
 	}
 

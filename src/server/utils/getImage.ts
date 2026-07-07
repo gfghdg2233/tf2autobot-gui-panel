@@ -1,6 +1,9 @@
 import SKU from '@tf2autobot/tf2-sku';
 import { qualityColors, paintCanColors } from '../data';
 import SchemaManager from "@tf2autobot/tf2-schema";
+import { createLogger } from './logger';
+
+const log = createLogger('schema');
 
 /**
  *
@@ -13,7 +16,7 @@ export function getImageFromSKU(sku: string, schema: SchemaManager.Schema): Imag
 	const found = schema.getItemByDefindex(item.defindex);
 
 	if (!found) {
-		console.log('Item with defindex ' + item.defindex + ' is not in schema');
+		log.debug(`Item defindex ${item.defindex} not found in schema`);
 		return;
 	}
 	if ((Object.keys(paintCanColors).indexOf(sku)) > -1) {

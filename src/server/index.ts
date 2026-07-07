@@ -2,7 +2,10 @@ import path from "path";
 import dotenv from 'dotenv';
 dotenv.config({ path: path.join(process.cwd(), '.env') });
 
-//require( 'console-stamp' )( console );
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require('console-stamp')(console, {
+    format: ':date(yyyy-mm-dd HH:MM:ss.l) :label(7)'
+});
 
 import express from 'express';
 import initApp from './express/init';
@@ -14,6 +17,9 @@ import * as http from "http";
 import { printStartupLog } from './startupLog';
 import { parsePort } from './utils/parsePort';
 import { startPanelUpdateScheduler } from './utils/panelUpdateScheduler';
+import { createLogger } from './utils/logger';
+
+const log = createLogger('server');
 // import {Bot} from "./Bot";
 const port = parsePort(process.env.PORT, 3000, 'PORT');
 const portHttps = parsePort(process.env.PORT_HTTPS, 443, 'PORT_HTTPS');
@@ -56,9 +62,9 @@ SchemaManager.prototype.getSchema = function (callback): void {
 const schemaManager = new SchemaManager({ apiKey: process.env.API_KEY });
 schemaManager.init(err => {
     if(err) {
-        console.error('Schema manager failed to init:', err);
-        console.error('Check network access to https://schema.autobot.tf/schema');
-        console.error('If HTTP_PROXY or HTTPS_PROXY is set on this host, unset it or add HTTP_PROXY_ENABLED=true only with a valid proxy URL.');
+        console.error('[schema] Failed to init:', err);
+        console.error('[schema] Check network access to https://schema.autobot.tf/schema');
+        console.error('[schema] If HTTP_PROXY or HTTPS_PROXY is set on this host, unset it or add HTTP_PROXY_ENABLED=true only with a valid proxy URL.');
         process.exit(1);
     } else {
         initApp(app, schemaManager, botConnectionManager);
@@ -70,23 +76,23 @@ schemaManager.init(err => {
             const httpsServer = https.createServer(credentials, app);
             const httpsPort = portNginx || portHttps;
             httpsServer.listen(httpsPort, portNginx ? "127.0.0.1" : undefined, () => {
-                console.log(`server listening on port ${httpsPort}`);
+                log.info(`HTTPS listening on port ${httpsPort}`);
                 startPanelUpdateScheduler();
             });
         } else {
             const httpServer = http.createServer(app);
             httpServer.on('error', (err: NodeJS.ErrnoException) => {
                 if (err.code === 'EADDRINUSE') {
-                    console.error(`Port ${port} is already in use. Stop the other process first:`);
-                    console.error(`  fuser -k ${port}/tcp`);
-                    console.error(`Or change PORT in your .env file.`);
+                    console.error(`[server] Port ${port} is already in use. Stop the other process first:`);
+                    console.error(`[server]   fuser -k ${port}/tcp`);
+                    console.error(`[server] Or change PORT in your .env file.`);
                     process.exit(1);
                 }
                 throw err;
             });
             httpServer.listen(port, () => {
-                console.log(`server listening on port ${port}`);
-                console.log(`Open http://localhost:${port} in your browser`);
+                log.info(`HTTP listening on port ${port}`);
+                log.info(`Open http://localhost:${port} in your browser`);
                 startPanelUpdateScheduler();
             });
         }
@@ -96,13 +102,13 @@ schemaManager.init(err => {
 
 process
     .on('uncaughtException', (err) => {
-        console.log('Received an uncaugh error.');
-        console.log(`Error message: ${err.message}`);
-        console.log(`Error stack: ${err.stack}`);
-        console.log('Please report this bug @ https://github.com/TF2Autobot/tf2autobot-gui/issues/new');
+        console.error('[server] Uncaught exception:', err.message);
+        if (err.stack) {
+            console.error(err.stack);
+        }
+        console.error('[server] Report bugs: https://github.com/uwu6967/tf2autobot-gui-panel/issues/new');
     })
-    .on('unhandledRejection', (reason, p) => {
-        console.log('Received an unhandled rejection.');
-        console.log(p);
-        console.log('Please report this @ https://github.com/TF2Autobot/tf2autobot-gui/issues/new');
+    .on('unhandledRejection', (reason) => {
+        console.error('[server] Unhandled rejection:', reason);
+        console.error('[server] Report bugs: https://github.com/uwu6967/tf2autobot-gui-panel/issues/new');
     });
