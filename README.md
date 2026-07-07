@@ -4,7 +4,7 @@ A web panel for managing your [TF2Autobot](https://github.com/TF2Autobot/tf2auto
 
 > **Recommended bot:** Use [**tf2autobot-pricedb**](https://github.com/uwu6967/tf2autobot-pricedb) with this panel. It is the tested fork for live pricedb.io prices, IPC, and the optional junk-deletion patches documented in this repo.
 
-**Current version:** 3.5.4
+**Current version:** 3.5.3
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-green.svg)
@@ -19,7 +19,7 @@ A web panel for managing your [TF2Autobot](https://github.com/TF2Autobot/tf2auto
 - **Pricelist management** — search, filter, grid/list views, bulk add, manual and autopriced items
 - **Live backpack.tf prices** — reference buy/sell prices from [pricedb.io](https://pricedb.io), auto-refresh, and a “differs from bptf” filter
 - **Trades** — browse completed and active trades
-- **Discord webhooks** — panel release announcements via `.env`; bot trade webhooks in Settings (TF2Autobot v15 format)
+- **Settings** — edit bot options from the browser (webhooks, misc settings, and more)
 - **Profit** — profit tracking and reporting
 - **Mann Co. UI** — TF2-themed layout with release notes page
 - **Multi-bot** — pick which connected bot to manage when several are online
@@ -58,7 +58,7 @@ On Linux you can also use `./start.sh`. On Windows, run `start.bat` after buildi
 
 For a full walkthrough — bot setup, IPC, first login, and troubleshooting — see **[TUTORIAL.md](TUTORIAL.md)**.
 
-Latest release: [v3.5.4](https://github.com/uwu6967/tf2autobot-gui-panel/releases/tag/v3.5.4)
+Latest release: [v3.5.3](https://github.com/uwu6967/tf2autobot-gui-panel/releases/tag/v3.5.3)
 
 ---
 
@@ -78,11 +78,6 @@ Copy `template.env` to `.env`. Never commit `.env`.
 | `VPS` | `false` | Set `true` on a public server |
 | `ADDRESS` | `localhost` | Public hostname/IP when `VPS=true` |
 | `SESSION_SECRET` | — | Random string for express sessions |
-| `DISCORD_WEBHOOK_URL` | *(empty)* | Discord webhook for **panel** release announcements |
-| `DISCORD_WEBHOOK_ENABLED` | `true` | Send release embed on startup (once per version) |
-| `DISCORD_WEBHOOK_ALWAYS` | `false` | Post on every startup (testing) |
-
-**Trade** Discord webhooks are configured in the panel under **Settings → discordWebhook** (bot options). See `patches/tf2autobot/DISCORD_WEBHOOKS.md`.
 
 Bot Steam credentials (`STEAM_PASSWORD`, shared secrets, etc.) belong in the **bot’s** `.env`, not the GUI `.env`.
 
