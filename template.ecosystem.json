@@ -2,7 +2,7 @@
   "apps": [
     {
       "name": "GUI",
-      "script": "dist/server.js",
+      "script": "dist/server/index.js",
       "exec_mode": "fork",
       "shutdown_with_message": false,
       "max_memory_restart": "1500M",

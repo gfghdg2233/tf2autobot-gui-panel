@@ -77,9 +77,39 @@ if (document.readyState === 'loading') {
         highlightActiveNav();
         initThemeSelector();
         initSidebarToggle();
+        initUpdateBadge();
     });
 } else {
     highlightActiveNav();
     initThemeSelector();
     initSidebarToggle();
+    initUpdateBadge();
+}
+
+function initUpdateBadge(): void {
+    const badge = document.getElementById('tf2-sidebar-version');
+    if (!badge) {
+        return;
+    }
+
+    const applyStatus = (updateAvailable: boolean): void => {
+        badge.classList.toggle('update-available', updateAvailable);
+        badge.setAttribute('title', updateAvailable ? 'Panel update available' : '');
+    };
+
+    document.addEventListener('panel-update-status', (event) => {
+        const detail = (event as CustomEvent<{ updateAvailable?: boolean }>).detail;
+        applyStatus(Boolean(detail?.updateAvailable));
+    });
+
+    void fetch('/updates/status')
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+            if (data && typeof data.updateAvailable === 'boolean') {
+                applyStatus(data.updateAvailable);
+            }
+        })
+        .catch(() => {
+            // ignore
+        });
 }
