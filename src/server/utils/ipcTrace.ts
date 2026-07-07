@@ -3,6 +3,14 @@ import { createLogger } from './logger';
 
 const traceLog = createLogger('ipc');
 
+type TraceState = {
+    signature: string;
+    lastAt: number;
+    suppressed: number;
+};
+
+const traceState = new Map<string, TraceState>();
+
 export function isIpcDebugEnabled(): boolean {
     return process.env.DEBUG_IPC === 'true';
 }
@@ -12,8 +20,29 @@ function isIpcVerboseEnabled(): boolean {
 }
 
 function sampleLimit(): number {
-    const parsed = Number.parseInt(process.env.DEBUG_IPC_SAMPLE || '5', 10);
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : 5;
+    const parsed = Number.parseInt(process.env.DEBUG_IPC_SAMPLE || '3', 10);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : 3;
+}
+
+function throttleMs(event: string): number {
+    const fallback = Number.parseInt(process.env.DEBUG_IPC_THROTTLE_MS || '5000', 10);
+
+    const perEvent: Record<string, number> = {
+        polldata: Number.parseInt(process.env.DEBUG_IPC_THROTTLE_POLL_MS || '30000', 10),
+        pricelist: Number.parseInt(process.env.DEBUG_IPC_THROTTLE_PRICELIST_MS || '15000', 10),
+        inventory: Number.parseInt(process.env.DEBUG_IPC_THROTTLE_INVENTORY_MS || '15000', 10)
+    };
+
+    const value = perEvent[event] ?? fallback;
+    return Number.isFinite(value) && value >= 0 ? value : fallback;
+}
+
+function shouldSkipEvent(event: string): boolean {
+    if (isIpcVerboseEnabled()) {
+        return false;
+    }
+
+    return ['connect', 'socket.disconnected', 'getInfo'].includes(event);
 }
 
 function botLabel(botId?: string): string {
@@ -53,7 +82,7 @@ function summarizePricelistItem(item: Record<string, unknown>): string {
     const flags: string[] = [];
 
     if (item.enabled === false) {
-        flags.push('disabled');
+        flags.push('off');
     }
 
     if (item.autoprice === true) {
@@ -66,14 +95,9 @@ function summarizePricelistItem(item: Record<string, unknown>): string {
         flags.push('partial');
     }
 
-    const intent = item.intent;
-    if (intent === 0 || intent === 1 || intent === 2) {
-        flags.push(`intent:${intent}`);
-    }
+    const flagText = flags.length > 0 ? ` [${flags.join(', ')}]` : '';
 
-    const flagText = flags.length > 0 ? ` (${flags.join(', ')})` : '';
-
-    return `  ${String(item.sku ?? '?')}  buy ${formatPrice(item.buy as { keys?: number; metal?: number })} / sell ${formatPrice(item.sell as { keys?: number; metal?: number })}${flagText}`;
+    return `  ${String(item.sku ?? '?')}  ${formatPrice(item.buy as { keys?: number; metal?: number })}/${formatPrice(item.sell as { keys?: number; metal?: number })}${flagText}`;
 }
 
 function summarizePricelist(data: unknown): string {
@@ -106,7 +130,7 @@ function summarizePricelist(data: unknown): string {
     }
 
     const lines = [
-        `  ${total} items · enabled ${enabled} · disabled ${disabled} · autopriced ${autopriced} · partial ${partial}`
+        `  ${total} items · on ${enabled} · off ${disabled} · auto ${autopriced} · partial ${partial}`
     ];
 
     if (isIpcVerboseEnabled()) {
@@ -118,7 +142,7 @@ function summarizePricelist(data: unknown): string {
     lines.push(...items.slice(0, limit).map(summarizePricelistItem));
 
     if (total > limit) {
-        lines.push(`  … and ${total - limit} more (DEBUG_IPC_VERBOSE=true for all, DEBUG_IPC_SAMPLE=${limit} to change sample size)`);
+        lines.push(`  … +${total - limit} more (DEBUG_IPC_VERBOSE=true for full list)`);
     }
 
     return lines.join('\n');
@@ -144,6 +168,10 @@ function summarizeInventory(data: unknown): string {
         `  ${tradableSkus.length} tradable SKUs (${tradableCount} items) · ${nonTradableSkus.length} non-tradable SKUs (${nonTradableCount} items)`
     ];
 
+    if (!isIpcVerboseEnabled()) {
+        return lines.join('\n');
+    }
+
     if (tradableSkus.length > 0) {
         const preview = tradableSkus.slice(0, sampleLimit()).join(', ');
         const suffix = tradableSkus.length > sampleLimit() ? ` … +${tradableSkus.length - sampleLimit()} more` : '';
@@ -162,19 +190,72 @@ function summarizePolldata(data: unknown): string {
         return '  (no polldata payload)';
     }
 
-    const record = data as Record<string, unknown>;
-    const offers = Array.isArray(record.offers) ? record.offers : null;
-    const received = Array.isArray(record.received) ? record.received : null;
-    const sent = Array.isArray(record.sent) ? record.sent : null;
+    const record = data as {
+        sent?: Record<string, unknown>;
+        received?: Record<string, unknown>;
+        timestamps?: Record<string, unknown>;
+        offerData?: Record<string, {
+            action?: { action?: string; reason?: string };
+            isAccepted?: boolean;
+            isDeclined?: boolean;
+            isCanceledUnknown?: boolean;
+            partner?: string;
+        }>;
+        offersSince?: number;
+    };
 
-    if (offers || received || sent) {
-        return [
-            `  offers ${offers?.length ?? 0} · received ${received?.length ?? 0} · sent ${sent?.length ?? 0}`
-        ].join('\n');
+    const sentCount = Object.keys(record.sent || {}).length;
+    const receivedCount = Object.keys(record.received || {}).length;
+    const offerData = record.offerData || {};
+    const offerCount = Object.keys(offerData).length;
+
+    let accepted = 0;
+    let declined = 0;
+    let countered = 0;
+    let other = 0;
+
+    for (const offer of Object.values(offerData)) {
+        const action = offer.action?.action;
+
+        if (offer.isAccepted || action === 'accept') {
+            accepted += 1;
+        } else if (offer.isDeclined || action === 'decline') {
+            declined += 1;
+        } else if (action === 'counter') {
+            countered += 1;
+        } else {
+            other += 1;
+        }
     }
 
-    const keys = Object.keys(record);
-    return `  object with ${keys.length} key${keys.length === 1 ? '' : 's'} (${keys.slice(0, sampleLimit()).join(', ')}${keys.length > sampleLimit() ? ', …' : ''})`;
+    const lines = [
+        `  active offers: sent ${sentCount} · received ${receivedCount}`,
+        `  history: ${offerCount} offers · accepted ${accepted} · declined ${declined} · countered ${countered} · other ${other}`
+    ];
+
+    if (record.offersSince) {
+        const since = Number(record.offersSince);
+        if (Number.isFinite(since)) {
+            const ms = since > 1_000_000_000_000 ? since : since * 1000;
+            lines.push(`  offersSince: ${new Date(ms).toISOString()}`);
+        }
+    }
+
+    if (isIpcVerboseEnabled() && offerCount > 0) {
+        const limit = sampleLimit();
+        const entries = Object.entries(offerData).slice(-limit);
+
+        for (const [id, offer] of entries) {
+            const action = offer.action ? `${offer.action.action}/${offer.action.reason}` : 'unknown';
+            lines.push(`  ${id}: ${action} · partner ${offer.partner ?? '?'}`);
+        }
+
+        if (offerCount > limit) {
+            lines.push(`  … +${offerCount - limit} older offers hidden`);
+        }
+    }
+
+    return lines.join('\n');
 }
 
 function summarizeItem(data: unknown): string {
@@ -192,9 +273,13 @@ function summarizeOptions(data: unknown): string {
     }
 
     const keys = Object.keys(data as Record<string, unknown>);
-    const preview = keys.slice(0, sampleLimit()).join(', ');
 
-    return `  ${keys.length} option key${keys.length === 1 ? '' : 's'}${preview ? `: ${preview}${keys.length > sampleLimit() ? ', …' : ''}` : ''}`;
+    if (!isIpcVerboseEnabled()) {
+        return `  ${keys.length} option keys`;
+    }
+
+    const preview = keys.slice(0, sampleLimit()).join(', ');
+    return `  ${keys.length} option keys: ${preview}${keys.length > sampleLimit() ? ', …' : ''}`;
 }
 
 function summarizePayload(event: string, data: unknown): string {
@@ -224,9 +309,12 @@ function summarizePayload(event: string, data: unknown): string {
                 return `  id=${info.id ?? '?'} name=${info.name ?? '?'}`;
             }
             return `  ${String(data)}`;
+        case 'connect':
+        case 'socket.disconnected':
+            return `  socket ${String((data as { socketId?: string })?.socketId ?? '?')}`;
         default:
             if (typeof data === 'string') {
-                return `  ${data.length > 240 ? `${data.slice(0, 240)}…` : data}`;
+                return `  ${data.length > 120 ? `${data.slice(0, 120)}…` : data}`;
             }
 
             if (typeof data === 'object') {
@@ -235,9 +323,13 @@ function summarizePayload(event: string, data: unknown): string {
                     return '  {}';
                 }
 
+                if (!isIpcVerboseEnabled()) {
+                    return `  object keys: ${keys.slice(0, sampleLimit()).join(', ')}${keys.length > sampleLimit() ? ', …' : ''}`;
+                }
+
                 return `  ${util.inspect(data, {
-                    depth: isIpcVerboseEnabled() ? 4 : 1,
-                    maxArrayLength: isIpcVerboseEnabled() ? 100 : 5,
+                    depth: 2,
+                    maxArrayLength: 10,
                     breakLength: 120,
                     compact: true
                 })}`;
@@ -247,18 +339,46 @@ function summarizePayload(event: string, data: unknown): string {
     }
 }
 
-export function traceIpcInbound(event: string, data: unknown, botId?: string): void {
+function emitTrace(direction: 'in' | 'out', event: string, data: unknown, botId?: string): void {
     if (!isIpcDebugEnabled()) {
         return;
     }
 
-    traceLog.info(`← ${event} (bot ${botLabel(botId)})\n${summarizePayload(event, data)}`);
+    if (shouldSkipEvent(event)) {
+        return;
+    }
+
+    const summary = summarizePayload(event, data);
+    const signature = `${direction}:${event}:${summary}`;
+    const key = `${botId ?? '?'}:${direction}:${event}`;
+    const now = Date.now();
+    const windowMs = throttleMs(event);
+    const previous = traceState.get(key);
+
+    if (previous && previous.signature === signature && now - previous.lastAt < windowMs) {
+        previous.suppressed += 1;
+        traceState.set(key, previous);
+        return;
+    }
+
+    if (previous && previous.suppressed > 0) {
+        traceLog.info(`  ↳ suppressed ${previous.suppressed} repeated ${event} trace(s) (${windowMs}ms window)`);
+    }
+
+    traceState.set(key, {
+        signature,
+        lastAt: now,
+        suppressed: 0
+    });
+
+    const arrow = direction === 'in' ? '←' : '→';
+    traceLog.info(`${arrow} ${event} (bot ${botLabel(botId)})\n${summary}`);
+}
+
+export function traceIpcInbound(event: string, data: unknown, botId?: string): void {
+    emitTrace('in', event, data, botId);
 }
 
 export function traceIpcOutbound(event: string, data: unknown, botId?: string): void {
-    if (!isIpcDebugEnabled()) {
-        return;
-    }
-
-    traceLog.info(`→ ${event} (bot ${botLabel(botId)})\n${summarizePayload(event, data)}`);
+    emitTrace('out', event, data, botId);
 }

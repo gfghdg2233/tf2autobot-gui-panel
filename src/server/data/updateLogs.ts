@@ -11,9 +11,9 @@ export const UPDATE_LOGS: UpdateLogEntry[] = [
 		date: '2026-07-07',
 		title: 'Readable IPC debug output',
 		changes: [
-			'DEBUG_IPC=true now logs compact pricelist summaries instead of dumping every item object',
-			'Sample rows show SKU, buy/sell prices, and flags; set DEBUG_IPC_VERBOSE=true for full payloads',
-			'Outgoing IPC requests are traced with the same summarizer'
+			'node-ipc socket spam silenced by default (no more megabyte polldata dumps on startup)',
+			'DEBUG_IPC=true logs compact summaries with throttling (polldata every 30s by default)',
+			'Pricelist/inventory/polldata show counts and a few sample rows; DEBUG_IPC_VERBOSE=true for detail'
 		]
 	},
 	{
