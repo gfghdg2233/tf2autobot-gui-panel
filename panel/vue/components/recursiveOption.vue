@@ -22,22 +22,11 @@
             </component>
 
             <template v-if="!isObject(value)">
-                <textarea
-                    v-if="isMultilineField(key, value)"
-                    :id="newParent(key)"
-                    :name="newParent(key)"
-                    rows="3"
-                    class="option-input option-textarea"
-                    v-model="vals[key]"
-                    :placeholder="getPlaceholder(key, value)"
-                ></textarea>
-
                 <input
-                    v-else
                     :id="newParent(key)"
                     :name="newParent(key)"
                     :type="getType(value)"
-                    :value="getType(value) === 'checkbox' ? 'true' : vals[key] = formatInputValue(value)"
+                    :value="getType(value) === 'checkbox' ? 'true' : vals[key] = value"
                     :checked="getType(value) === 'checkbox' ? value : false"
                     v-model="vals[key]"
                     class="option-input"
@@ -68,15 +57,9 @@ export default {
     props: ['for', 'level', 'data', 'parent'],
 
     data: function () {
-        const vals = { ...this.data };
-
-        for (const [key, value] of Object.entries(vals)) {
-            if (Array.isArray(value)) {
-                vals[key] = value.join('\n');
-            }
+        return {
+            vals: this.data
         }
-
-        return { vals };
     },
 
     methods: {
@@ -108,43 +91,6 @@ export default {
                 .replace(/[_-]/g, ' ')
                 .replace(/([a-z])([A-Z])/g, '$1 $2')
                 .replace(/\b\w/g, character => character.toUpperCase());
-        },
-
-        formatInputValue(value) {
-            if (Array.isArray(value)) {
-                return value.join('\n');
-            }
-
-            return value;
-        },
-
-        isMultilineField(key, value) {
-            if (Array.isArray(value)) {
-                return true;
-            }
-
-            if (typeof value !== 'string') {
-                return false;
-            }
-
-            const fieldPath = this.newParent(key).toLowerCase();
-            return key === 'url'
-                || fieldPath.includes('webhook')
-                || fieldPath.includes('discord')
-                || value.length > 80
-                || value.includes('http');
-        },
-
-        getPlaceholder(key, value) {
-            if (Array.isArray(value)) {
-                return 'One webhook URL per line';
-            }
-
-            if (key === 'url' || String(key).toLowerCase().includes('url')) {
-                return 'https://discord.com/api/webhooks/...';
-            }
-
-            return '';
         }
     }
 };
@@ -201,13 +147,6 @@ h6.option-heading {
 .option-input {
     width: 100%;
     min-height: 2.4rem;
-}
-
-.option-textarea {
-    min-height: 4.5rem;
-    resize: vertical;
-    font-family: "Roboto Condensed", monospace;
-    font-size: 0.88rem;
 }
 
 input[type='checkbox'].option-input {

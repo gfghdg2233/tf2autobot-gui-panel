@@ -14,7 +14,6 @@ import * as http from "http";
 import { printStartupLog } from './startupLog';
 import { parsePort } from './utils/parsePort';
 import { startPanelUpdateScheduler } from './utils/panelUpdateScheduler';
-import { notifyDiscordVersionUpdate } from './utils/discordWebhook';
 // import {Bot} from "./Bot";
 const port = parsePort(process.env.PORT, 3000, 'PORT');
 const portHttps = parsePort(process.env.PORT_HTTPS, 443, 'PORT_HTTPS');
@@ -22,12 +21,6 @@ const portNginx = process.env.PORT_NGINX ? parsePort(process.env.PORT_NGINX, 0, 
 
 const pkg = require(path.join(process.cwd(), 'package.json'));
 printStartupLog(pkg.version);
-
-function onServerReady(): void {
-    startPanelUpdateScheduler();
-    void notifyDiscordVersionUpdate(pkg.version);
-}
-
 const app = express();
 
 // var bots = new Map() as  Map<Number, Bot>;
@@ -78,7 +71,7 @@ schemaManager.init(err => {
             const httpsPort = portNginx || portHttps;
             httpsServer.listen(httpsPort, portNginx ? "127.0.0.1" : undefined, () => {
                 console.log(`server listening on port ${httpsPort}`);
-                onServerReady();
+                startPanelUpdateScheduler();
             });
         } else {
             const httpServer = http.createServer(app);
@@ -94,7 +87,7 @@ schemaManager.init(err => {
             httpServer.listen(port, () => {
                 console.log(`server listening on port ${port}`);
                 console.log(`Open http://localhost:${port} in your browser`);
-                onServerReady();
+                startPanelUpdateScheduler();
             });
         }
     }
