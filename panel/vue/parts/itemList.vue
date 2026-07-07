@@ -17,6 +17,7 @@
                 <tbody>
                     <tr
                         class="item-row"
+                        :class="rowStatusClass(item)"
                         v-for="item in filtered"
                         :key="item.sku"
                         @click="$emit('itemClick', item)"
@@ -199,6 +200,20 @@ export default {
     },
 
     methods: {
+        rowStatusClass(item: any): Record<string, boolean> {
+            if (item?.enabled === false) {
+                return { 'row-disabled': true };
+            }
+
+            const buyClass = this.referenceClass(item, 'buy');
+            const sellClass = this.referenceClass(item, 'sell');
+            if (buyClass === 'higher' || buyClass === 'lower' || sellClass === 'higher' || sellClass === 'lower') {
+                return { 'row-mismatch': true };
+            }
+
+            return { 'row-enabled': true };
+        },
+
         async copySku(sku: string) {
             if (!sku) {
                 return;

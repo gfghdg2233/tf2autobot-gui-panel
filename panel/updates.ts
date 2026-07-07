@@ -1,4 +1,4 @@
 import * as Vue from 'vue';
-import updatesPanel from './vue/updatesPanel.vue';
+import versionsPanel from './vue/versionsPanel.vue';
 
-Vue.createApp(updatesPanel).mount('#update-panel');
+Vue.createApp(versionsPanel).mount('#update-panel');

@@ -215,6 +215,19 @@
     );
 }
 
+[data-theme="sourcebans"] {
+    @include theme-palette(
+        #18181b, #09090b, #1f1f23, #27272a, #141416,
+        #ea580c, #f97316, #c2410c,
+        #fafafa, #e4e4e7, #a1a1aa, #3f3f46, #09090b,
+        #ef4444, #f87171, #3b82f6, #60a5fa, #22c55e, #4ade80,
+        #27272a, #1f1f23, #18181b, #09090b,
+        #fafafa, rgba(250, 250, 250, 0.72),
+        #111113, #09090b, #18181b,
+        rgba(249, 115, 22, 0.12), rgba(249, 115, 22, 0.08)
+    );
+}
+
 // Theme selector UI
 .tf2-header-controls {
     display: flex;
