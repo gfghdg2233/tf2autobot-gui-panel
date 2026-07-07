@@ -1,14 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Not allowed</title>
-</head>
-<body>
-	<img src="/images/nope.jfif" alt="nope" height="300" style="display:inline;">
-	<h1>
-		There are no bots connected :(
-	</h1>
-</body>
-</html>
+{% extends "templates/base.njk" %}
+{% block content %}
+<div class="sb-page-head">
+    <h1 class="sb-page-title">No bot connected</h1>
+    <p class="sb-page-subtitle">The panel is running, but no trading bot has connected over IPC yet.</p>
+</div>
+<div class="sb-console-card">
+    <h2>Windows (D:\panel + D:\tf2autobot)</h2>
+    <ol>
+        <li>Run <code>.\setup-bot.ps1</code> from the panel folder (once).</li>
+        <li>Start the <strong>panel</strong> first: <code>node dist/server/index.js</code></li>
+        <li>Start the <strong>bot</strong>: <code>cd D:\tf2autobot</code> then <code>node dist/app.js</code></li>
+        <li>Bot <code>.env</code> must have <code>IPC=true</code> and <code>TLS=false</code>.</li>
+        <li>Your SteamID64 must be in bot <code>ADMINS=</code> to use the panel.</li>
+    </ol>
+    <p>Status: <a href="/health/bot">/health/bot</a> — reload this page after the bot connects.</p>
+</div>
+{% endblock %}

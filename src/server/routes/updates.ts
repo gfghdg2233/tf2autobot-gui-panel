@@ -9,6 +9,11 @@ import {
     getUpdateJobStatus,
     savePanelUpdateSettings
 } from '../utils/panelUpdate';
+import {
+    applyBotUpdate,
+    checkForBotUpdate,
+    getBotUpdateJobStatus
+} from '../utils/botUpdate';
 
 export default function updates(botManager: BotConnectionManager): Router {
     const router = express.Router();
@@ -24,6 +29,50 @@ export default function updates(botManager: BotConnectionManager): Router {
         try {
             const status = await checkForPanelUpdate(false);
             res.json(status);
+        } catch (err) {
+            next(err);
+        }
+    });
+
+    router.get('/combined/status', async (_req, res, next) => {
+        try {
+            const [panel, bot] = await Promise.all([
+                checkForPanelUpdate(false),
+                checkForBotUpdate(false)
+            ]);
+            res.json({ panel, bot });
+        } catch (err) {
+            next(err);
+        }
+    });
+
+    router.get('/bot/status', async (_req, res, next) => {
+        try {
+            res.json(await checkForBotUpdate(false));
+        } catch (err) {
+            next(err);
+        }
+    });
+
+    router.post('/bot/check', adminOnly, async (_req, res, next) => {
+        try {
+            res.json(await checkForBotUpdate(true));
+        } catch (err) {
+            next(err);
+        }
+    });
+
+    router.post('/bot/apply', adminOnly, async (_req, res, next) => {
+        try {
+            res.json(await applyBotUpdate());
+        } catch (err) {
+            next(err);
+        }
+    });
+
+    router.get('/bot/job', adminOnly, async (_req, res, next) => {
+        try {
+            res.json(await getBotUpdateJobStatus());
         } catch (err) {
             next(err);
         }

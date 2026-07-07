@@ -15,6 +15,13 @@ export = function init(
 
     initBody(app);
 
+    app.get('/health/bot', (_req, res) => {
+        res.json({
+            ipcReady: botManager.isReady(),
+            bots: botManager.listBots()
+        });
+    });
+
     if (process.env.STEAM_AUTH) {
         initPassport(app, botManager);
     } else {
