@@ -12,10 +12,11 @@ import fs from "fs";
 import * as https from "https";
 import * as http from "http";
 import { printStartupLog } from './startupLog';
+import { parsePort } from './utils/parsePort';
 // import {Bot} from "./Bot";
-const port = +process.env.PORT;
-const portHttps = +process.env.PORT_HTTPS;
-const portNginx = +process.env.PORT_NGINX;
+const port = parsePort(process.env.PORT, 3000, 'PORT');
+const portHttps = parsePort(process.env.PORT_HTTPS, 443, 'PORT_HTTPS');
+const portNginx = process.env.PORT_NGINX ? parsePort(process.env.PORT_NGINX, 0, 'PORT_NGINX') : 0;
 
 const pkg = require(path.join(process.cwd(), 'package.json'));
 printStartupLog(pkg.version);
@@ -54,7 +55,10 @@ SchemaManager.prototype.getSchema = function (callback): void {
 const schemaManager = new SchemaManager({ apiKey: process.env.API_KEY });
 schemaManager.init(err => {
     if(err) {
-        throw new Error('Schema manager failed to init, with error: ' + err);
+        console.error('Schema manager failed to init:', err);
+        console.error('Check network access to https://schema.autobot.tf/schema');
+        console.error('If HTTP_PROXY or HTTPS_PROXY is set on this host, unset it or add HTTP_PROXY_ENABLED=true only with a valid proxy URL.');
+        process.exit(1);
     } else {
         initApp(app, schemaManager, botConnectionManager);
         if(process.env.SSL === 'true') {
@@ -63,7 +67,10 @@ schemaManager.init(err => {
                 cert: fs.readFileSync(process.env.CERT_FILE || 'local.crt', 'utf8')
             };
             const httpsServer = https.createServer(credentials, app);
-            httpsServer.listen(portNginx || portHttps, portNginx ? "127.0.0.1" : undefined);
+            const httpsPort = portNginx || portHttps;
+            httpsServer.listen(httpsPort, portNginx ? "127.0.0.1" : undefined, () => {
+                console.log(`server listening on port ${httpsPort}`);
+            });
         } else {
             const httpServer = http.createServer(app);
             httpServer.on('error', (err: NodeJS.ErrnoException) => {

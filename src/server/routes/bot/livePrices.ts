@@ -1,6 +1,7 @@
 import express, { Router } from 'express';
 import axios, { AxiosRequestConfig } from 'axios';
 import Currency from '@tf2autobot/tf2-currencies';
+import { externalAxiosOptions } from '../../utils/httpDefaults';
 
 interface RawPrice {
     keys?: number;
@@ -116,7 +117,8 @@ async function fetchPriceDbBulk(skus: string[]): Promise<Map<string, LivePriceIt
             },
             responseType: 'json',
             timeout: PRICE_DB_TIMEOUT_MS,
-            validateStatus: (status) => status >= 200 && status < 500
+            validateStatus: (status) => status >= 200 && status < 500,
+            ...externalAxiosOptions()
         };
 
         const { data, status } = await axios(options);

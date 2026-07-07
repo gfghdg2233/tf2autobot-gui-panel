@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { externalAxiosOptions } from './httpDefaults';
 
 const FALLBACK_KEY_PRICE = 56;
 const CACHE_TTL_MS = 5 * 60 * 1000;
@@ -30,7 +31,8 @@ export async function getKeyPrice(): Promise<number> {
             url: 'https://pricedb.io/api/items-bulk',
             data: { skus: [KEY_SKU] },
             responseType: 'json',
-            timeout: 12000
+            timeout: 12000,
+            ...externalAxiosOptions()
         });
 
         const items = response.data?.items as PricedItem[] | undefined;
