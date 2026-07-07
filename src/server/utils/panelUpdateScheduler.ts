@@ -4,6 +4,9 @@ import {
     getPanelUpdateSettings,
     isUpdateInProgress
 } from './panelUpdate';
+import { createLogger } from './logger';
+
+const log = createLogger('panel-update');
 
 let timer: NodeJS.Timeout | null = null;
 
@@ -18,17 +21,17 @@ async function runScheduledCheck(): Promise<void> {
 
         if (settings.autoUpdate && result.updateAvailable && !isUpdateInProgress()) {
             if (result.git.isRepo && !result.git.dirty) {
-                console.log('[panel-update] Auto-update: new version available, applying...');
+                log.info('Auto-update: new version available, applying...');
                 const apply = await applyPanelUpdate();
-                console.log(`[panel-update] ${apply.message}`);
+                log.info(apply.message);
             } else {
-                console.log('[panel-update] Auto-update skipped (not a clean git repo).');
+                log.info('Auto-update skipped (not a clean git repo).');
             }
         } else if (result.updateAvailable) {
-            console.log(`[panel-update] Update available: v${result.latestVersion} (current v${result.currentVersion})`);
+            log.info(`Update available: v${result.latestVersion} (current v${result.currentVersion})`);
         }
     } catch (err) {
-        console.error('[panel-update] Scheduled check failed:', err);
+        log.error('Scheduled check failed:', err);
     }
 }
 

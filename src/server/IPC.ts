@@ -1,5 +1,8 @@
 import { Pricelist, PricelistItem } from "../common/types/pricelist";
 import { InventorySnapshot } from "../common/types/inventory";
+import { createLogger } from './utils/logger';
+
+const log = createLogger('ipc');
 
 const { IPCModule } = require('node-ipc');
 
@@ -228,17 +231,17 @@ export default class BotConnectionManager {
     init() {
         this.ipc.config.id = 'autobot_gui';
         this.ipc.config.retry = 1500;
-        this.ipc.config.logger = console.debug;
+        this.ipc.config.logger = log.debug.bind(log);
         this.ipc.config.readableAll = true;
         this.ipc.config.writableAll = true;
-        this.ipc.config.silent = process.env.NODE_ENV === 'production';
+        this.ipc.config.silent = process.env.DEBUG_IPC !== 'true';
         this.ipc.serve(() => {
             this.initiated = true;
             this.ipc.server.on(
                 'info',
                 (data, socket) => {
                     if (!this.bots[data.id]) {
-                        console.log(`bot connected: ${data.name ?? data.id} (${data.id})`);
+                        log.info(`Bot connected: ${data.name ?? data.id} (${data.id})`);
                         socket.id = data.id;
                         this.bots[data.id] = {
                             socket,
@@ -279,7 +282,7 @@ export default class BotConnectionManager {
                 (socket) => {
                     const bot = this.bots[socket.id];
                     if (bot) {
-                        console.log(`bot disconnected: ${bot.name} (${bot.id})`);
+                        log.info(`Bot disconnected: ${bot.name} (${bot.id})`);
                     }
                     delete this.bots[socket.id];
                 }
@@ -289,7 +292,7 @@ export default class BotConnectionManager {
         const ipcPath = process.platform === 'win32'
             ? '\\\\.\\pipe\\app.autobot_gui'
             : '/tmp/app.autobot_gui';
-        console.log(`IPC server listening (id: autobot_gui, path: ${ipcPath})`);
-        console.log('Start tf2autobot-pricedb with IPC=true in the bot .env, then wait for "bot connected".');
+        log.info(`IPC listening (id: autobot_gui, path: ${ipcPath})`);
+        log.info('Start tf2autobot-pricedb with IPC=true in the bot .env, then wait for "Bot connected".');
     }
 }
