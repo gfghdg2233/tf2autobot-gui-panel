@@ -1,5 +1,6 @@
 import express, { Router } from 'express';
-import { UPDATE_LOGS } from '../data/updateLogs';
+import { UPDATE_LOGS, getLatestUpdateLog } from '../data/updateLogs';
+import { buildDiscordUpdatePayload } from '../utils/discordWebhook';
 import BotConnectionManager from '../IPC';
 import { requirePanelAdmin } from '../middleware/requirePanelAdmin';
 import {
@@ -10,13 +11,51 @@ import {
     savePanelUpdateSettings
 } from '../utils/panelUpdate';
 
+function formatDiscordPreviewText(text: string): string {
+    return text
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+        .replace(/\n/g, '<br>');
+}
+
+function buildDiscordPreview() {
+    const latest = getLatestUpdateLog();
+    const rawPreview = latest
+        ? buildDiscordUpdatePayload(latest.version, latest)
+        : null;
+    const embed = rawPreview?.embeds?.[0] as {
+        title?: string;
+        description?: string;
+        fields?: Array<{ name: string; value: string; inline?: boolean }>;
+        footer?: { text?: string };
+        timestamp?: string;
+    } | undefined;
+
+    if (!rawPreview || !embed) {
+        return null;
+    }
+
+    return {
+        username: rawPreview.username,
+        title: embed.title,
+        description: embed.description,
+        footer: embed.footer?.text,
+        dateLabel: embed.timestamp ? embed.timestamp.slice(0, 10) : latest?.date,
+        fields: (embed.fields ?? []).map((field) => ({
+            name: field.name,
+            value: formatDiscordPreviewText(field.value),
+            inline: field.inline === true
+        }))
+    };
+}
+
 export default function updates(botManager: BotConnectionManager): Router {
     const router = express.Router();
     const adminOnly = requirePanelAdmin(botManager);
 
     router.get('/', (_req, res) => {
         res.render('updates', {
-            logs: UPDATE_LOGS
+            logs: UPDATE_LOGS,
+            discordPreview: buildDiscordPreview()
         });
     });
 
