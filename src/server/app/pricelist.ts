@@ -5,6 +5,9 @@ import Currencies from '@tf2autobot/tf2-currencies';
 import getSKU from '../utils/getSKU';
 import getName from '../utils/getName';
 import paths from '../config/paths';
+import { createLogger } from '../utils/logger';
+
+const log = createLogger('pricelist');
 
 export async function addItems(search, options, schema) {
 	let skus = [];
@@ -28,7 +31,7 @@ export async function addItems(search, options, schema) {
 
 	if (options.autoprice) {
 		const prices = await getAllPrices();
-		console.log('Got all prices, continuing...');
+		log.debug('Loaded backpack.tf price index, continuing bulk add');
 		const pricesItems = prices.items;
 		const itemsCount = pricesItems.length;
 
@@ -266,7 +269,7 @@ export function clear() {
  * @return {Object} pricelist
  */
 async function getAllPrices(): Promise<GetPricelistResponse> {
-	console.log('Getting all prices...');
+	log.debug('Fetching backpack.tf price index...');
 
 	const options: AxiosRequestConfig = {
 		method: 'GET',
@@ -285,8 +288,7 @@ async function getAllPrices(): Promise<GetPricelistResponse> {
 				throw new Error('Couldn\'t get all prices from pricestf: ' + data.message);
 			}
 
-			const end = Date.now() - start;
-			console.info('Execution time: %dms', end);
+			log.debug(`backpack.tf price index fetched in ${Date.now() - start}ms`);
 
 			return data.items;
 		});

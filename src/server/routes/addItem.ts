@@ -3,6 +3,9 @@ const router = express.Router();
 import Currency from '@tf2autobot/tf2-currencies';
 import * as pricelist from '../app/pricelist';
 import SchemaManager from "@tf2autobot/tf2-schema";
+import { createLogger } from '../utils/logger';
+
+const log = createLogger('add-item');
 
 export = function (schemaManager: SchemaManager): Router {
 	const router = express.Router();
@@ -108,7 +111,7 @@ export = function (schemaManager: SchemaManager): Router {
 				res.json(status);
 			})
 			.catch((err) => {
-				console.log(err);
+				log.error('Add item failed:', err);
 				res.json({
 					success: 0,
 					msg: {
