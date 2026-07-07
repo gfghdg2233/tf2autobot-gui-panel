@@ -160,6 +160,8 @@ export default {
                 } else {
                     this.edit = false;
                 }
+            } else if (item) {
+                Object.assign(this.item, item);
             }
             this.modal.show();
         },

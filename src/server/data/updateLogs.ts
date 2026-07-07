@@ -7,6 +7,17 @@ export interface UpdateLogEntry {
 
 export const UPDATE_LOGS: UpdateLogEntry[] = [
 	{
+		version: '3.5.0',
+		date: '2026-07-07',
+		title: 'Unlisted Stock page',
+		changes: [
+			'New sidebar tab for tradable backpack items not yet on the pricelist',
+			'Highlights recent trade pickups from the last 7 days',
+			'List items for sale individually or bulk-add with autoprice',
+			'Requires bot inventory IPC patch (see patches/tf2autobot/INVENTORY_IPC.md)'
+		]
+	},
+	{
 		version: '3.4.3',
 		date: '2026-07-05',
 		title: 'Vertical sidebar navigation',
