@@ -9,6 +9,69 @@ import { isCurrencySku } from '../utils/currencySkus';
 
 const RECENT_TRADE_MS = 7 * 24 * 60 * 60 * 1000;
 
+export function normalizeInventorySnapshot(raw: unknown): InventorySnapshot {
+	if (!raw || typeof raw !== 'object') {
+		return { tradable: {}, updatedAt: Date.now() };
+	}
+
+	const obj = raw as Record<string, unknown>;
+
+	if (obj.tradable && typeof obj.tradable === 'object') {
+		const tradable: Record<string, string[]> = {};
+
+		for (const [sku, value] of Object.entries(obj.tradable as Record<string, unknown>)) {
+			if (!Array.isArray(value)) {
+				continue;
+			}
+
+			tradable[sku] = value
+				.map((entry) => {
+					if (typeof entry === 'string' || typeof entry === 'number') {
+						return String(entry);
+					}
+
+					if (entry && typeof entry === 'object' && 'id' in entry) {
+						return String((entry as { id: string | number }).id);
+					}
+
+					return '';
+				})
+				.filter(Boolean);
+		}
+
+		return {
+			tradable,
+			nonTradable: obj.nonTradable as InventorySnapshot['nonTradable'],
+			updatedAt: typeof obj.updatedAt === 'number' ? obj.updatedAt : Date.now()
+		};
+	}
+
+	// Legacy bots sent a flat tradable dict at the top level.
+	const tradable: Record<string, string[]> = {};
+
+	for (const [sku, value] of Object.entries(obj)) {
+		if (!Array.isArray(value)) {
+			continue;
+		}
+
+		tradable[sku] = value
+			.map((entry) => {
+				if (typeof entry === 'string' || typeof entry === 'number') {
+					return String(entry);
+				}
+
+				if (entry && typeof entry === 'object' && 'id' in entry) {
+					return String((entry as { id: string | number }).id);
+				}
+
+				return '';
+			})
+			.filter(Boolean);
+	}
+
+	return { tradable, updatedAt: Date.now() };
+}
+
 export function getRecentlyReceivedSkus(polldata: Record<string, unknown> | null | undefined, withinMs = RECENT_TRADE_MS): Set<string> {
 	const skus = new Set<string>();
 	const cutoff = Date.now() - withinMs;

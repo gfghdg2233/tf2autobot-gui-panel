@@ -1,7 +1,7 @@
 import express, { Router } from 'express';
 import SchemaManager from '@tf2autobot/tf2-schema';
 import BotConnectionManager from '../IPC';
-import { buildUnlistedItems } from '../app/unlisted';
+import { buildUnlistedItems, normalizeInventorySnapshot } from '../app/unlisted';
 import { UnlistedItem } from '../../common/types/inventory';
 import { getLivePricesForSkus } from '../utils/livePrices';
 
@@ -49,7 +49,12 @@ export = function unlisted(schemaManager: SchemaManager, botManager: BotConnecti
 				botManager.getTrades(req.session.bot)
 			]);
 
-			const items = buildUnlistedItems(inventory, pricelist ?? {}, polldata as Record<string, unknown>, schema);
+			const items = buildUnlistedItems(
+				normalizeInventorySnapshot(inventory),
+				pricelist ?? {},
+				polldata as Record<string, unknown>,
+				schema
+			);
 			await attachLivePrices(items);
 
 			res.json({
