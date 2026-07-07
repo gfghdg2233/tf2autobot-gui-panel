@@ -1,10 +1,35 @@
 #!/usr/bin/env bash
-# Restore GitHub releases published under your account (not cursor[bot]).
-# Run locally after: gh auth login  (as uwu6967)
+# Publish GitHub releases under your account (uwu6967), not cursor[bot].
+#
+# Cloud Agents cannot do this — they only have the cursor[bot] app token, so
+# releases created from Cursor show as cursor[bot]. Run this script locally:
+#
+#   gh auth login          # sign in as uwu6967
+#   bash scripts/restore-github-releases.sh
+#
+# If releases already exist (e.g. from cursor[bot]), pass --replace to delete
+# and recreate them under your account:
+#
+#   bash scripts/restore-github-releases.sh --replace
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 NOTES_DIR="$ROOT/scripts/release-notes"
+REPLACE=false
+
+for arg in "$@"; do
+    case "$arg" in
+        --replace) REPLACE=true ;;
+        -h|--help)
+            sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $arg (try --help)"
+            exit 1
+            ;;
+    esac
+done
 
 if ! gh auth status >/dev/null 2>&1; then
     echo "Run: gh auth login"
@@ -55,8 +80,14 @@ for tag in v3.3.3 v3.4.0 v3.4.1 v3.4.2 v3.4.3 v3.5.0 v3.5.1 v3.5.2 v3.5.3 v3.5.4
     notes="$NOTES_DIR/${tag}.md"
 
     if gh release view "$tag" >/dev/null 2>&1; then
-        echo "Skip $tag (release already exists)"
-        continue
+        author="$(gh release view "$tag" --json author --jq .author.login 2>/dev/null || true)"
+        if [[ "$REPLACE" == true ]]; then
+            echo "Deleting existing release $tag (author: ${author:-unknown})"
+            gh release delete "$tag" --yes
+        else
+            echo "Skip $tag (release already exists${author:+, by $author}; use --replace to recreate)"
+            continue
+        fi
     fi
 
     if ! git rev-parse "$tag" >/dev/null 2>&1; then
