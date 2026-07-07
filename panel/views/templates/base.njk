@@ -46,6 +46,12 @@
                 </span>
                 <span class="tf2-sidebar-label">Pricelist</span>
             </a>
+            <a href="/?add=1" class="tf2-sidebar-link tf2-sidebar-sub">
+                <span class="tf2-sidebar-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </span>
+                <span class="tf2-sidebar-label">Add Item</span>
+            </a>
             <a href="/trades" class="tf2-sidebar-link" data-nav>
                 <span class="tf2-sidebar-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
@@ -103,12 +109,6 @@
         <main class="app-root tf2-main" id="app">
             {% block body %}{% endblock %}
         </main>
-
-        <footer class="tf2-footer">
-            <span>TF2Autobot GUI</span>
-            <span class="tf2-footer-dot">&bull;</span>
-            <span>Mann Co. approved*</span>
-        </footer>
     </div>
 </div>
 {% block javascripts %}{% endblock %}

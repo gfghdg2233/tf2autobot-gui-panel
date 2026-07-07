@@ -385,6 +385,14 @@ export default {
 
     mounted() {
         this.livePriceTimer = setInterval(() => this.loadLivePrices(), 60000);
+
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('add') === '1') {
+            this.$nextTick(() => {
+                (this.$refs.priceModal as { show: () => void }).show();
+                window.history.replaceState({}, '', '/');
+            });
+        }
     },
 
     beforeUnmount() {

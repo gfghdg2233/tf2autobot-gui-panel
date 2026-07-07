@@ -5,6 +5,40 @@ import SKU from '@tf2autobot/tf2-sku';
 import * as getImage from '../utils/getImage';
 import * as profit from './profit';
 import SchemaManager from "@tf2autobot/tf2-schema";
+import Currency from '@tf2autobot/tf2-currencies';
+import { getSteamProfiles } from '../utils/steamProfiles';
+
+interface TradeOfferData {
+	id?: string;
+	dict?: { our?: Record<string, number>; their?: Record<string, number> };
+	prices?: Record<string, { buy?: { keys?: number; metal?: number }; sell?: { keys?: number; metal?: number } }>;
+	partner?: string;
+	accepted?: boolean;
+	handledByUs?: boolean;
+	isAccepted?: boolean;
+	finishTimestamp?: number;
+	value?: { our?: { keys?: number; metal?: number }; their?: { keys?: number; metal?: number } };
+}
+
+function formatTradePrice(
+	prices: TradeOfferData['prices'],
+	sku: string,
+	side: 'our' | 'their'
+): string {
+	if (!prices?.[sku]) {
+		return '—';
+	}
+
+	const priceSide = side === 'our' ? prices[sku].sell : prices[sku].buy;
+	if (!priceSide) {
+		return '—';
+	}
+
+	return new Currency({
+		keys: Number(priceSide.keys || 0),
+		metal: Number(priceSide.metal || 0)
+	}).toString();
+}
 
 /**
  *
@@ -20,24 +54,24 @@ export async function get(first: number, count: number, descending: boolean, sea
     search = search.trim().toLowerCase();
     const profitData = (await profit.get(undefined, undefined, undefined, polldata, true)).tradeProfits;
     let tradeList = Object.keys(polldata?.offerData || {}).map((key) => {
-        const ret = polldata.offerData[key];
+        const ret = polldata.offerData[key] as TradeOfferData;
         ret.id = key;
         return ret;
     });
     tradeList = tradeList.sort((a, b) => {
-        a = a.finishTimestamp;
-        b = b.finishTimestamp;
+        let aTime = a.finishTimestamp;
+        let bTime = b.finishTimestamp;
 
         // check for undefined time, sort those at the end
-        if ( (!a || isNaN(a)) && !(!b || isNaN(b))) {return 1;}
-        if ( !(!a || isNaN(a)) && (!b || isNaN(b))) {return -1;}
-        if ( (!a || isNaN(a)) && (!b || isNaN(b))) {return 0;}
+        if ( (!aTime || isNaN(aTime)) && !(!bTime || isNaN(bTime))) {return 1;}
+        if ( !(!aTime || isNaN(aTime)) && (!bTime || isNaN(bTime))) {return -1;}
+        if ( (!aTime || isNaN(aTime)) && (!bTime || isNaN(bTime))) {return 0;}
 
         if (descending) {
-            b = [a, a = b][0];
+            bTime = [aTime, aTime = bTime][0];
         }
 
-        return a - b;
+        return aTime - bTime;
     });
     tradeList = tradeList.filter((offer) => {
         if(!search) {return (offer.isAccepted || !acceptedOnly);}
@@ -61,6 +95,9 @@ export async function get(first: number, count: number, descending: boolean, sea
             },
             profit: Object.prototype.hasOwnProperty.call(profitData, offer.id)?profitData[offer.id]: '',
             partner: offer.partner,
+            partnerName: offer.partner,
+            partnerProfileUrl: offer.partner ? `https://steamcommunity.com/profiles/${offer.partner}` : '',
+            partnerTradeHistoryUrl: offer.partner ? `https://steamcommunity.com/profiles/${offer.partner}/tradehistory/` : '',
             accepted: offer.accepted || ( offer.handledByUs === true && offer.isAccepted === true),
             time: offer.finishTimestamp,
             datetime: dayjs.unix(Math.floor(offer.finishTimestamp/1000)).format('ddd D-M-YYYY HH:mm'),
@@ -73,11 +110,11 @@ export async function get(first: number, count: number, descending: boolean, sea
             ret['lastState'] = data.ETradeOfferState[polldata.received[offer.id]];
         }
 
-        if (Object.prototype.hasOwnProperty.call(offer, 'dict')) {
-            if (Object.keys(offer.dict.our).length > 0) {
+        if (Object.prototype.hasOwnProperty.call(offer, 'dict') && offer.dict) {
+            if (Object.keys(offer.dict.our || {}).length > 0) {
                 tradeSide('our');
             }
-            if (Object.keys(offer.dict.their).length > 0) {
+            if (Object.keys(offer.dict.their || {}).length > 0) {
                 tradeSide('their');
             }
         }
@@ -95,11 +132,25 @@ export async function get(first: number, count: number, descending: boolean, sea
                 }
                 ret.items[side].push({
                     sku: k,
-                    amount: offer.dict[side][k]
+                    amount: offer.dict[side][k],
+                    price: formatTradePrice(offer.prices, k, side)
                 });
             });
         }
     });
+
+    const partnerIds = trades.map((trade) => trade.partner).filter(Boolean) as string[];
+    const profiles = await getSteamProfiles(partnerIds);
+
+    for (const trade of trades) {
+        const profile = profiles[trade.partner];
+        if (profile) {
+            trade.partnerName = profile.name;
+            trade.partnerProfileUrl = profile.profileUrl;
+            trade.partnerTradeHistoryUrl = profile.tradeHistoryUrl;
+        }
+    }
+
     return {
         trades,
         items,
