@@ -7,6 +7,15 @@ export interface UpdateLogEntry {
 
 export const UPDATE_LOGS: UpdateLogEntry[] = [
 	{
+		version: '3.5.5',
+		date: '2026-07-07',
+		title: 'Sidebar theme pinned to screen on all tabs',
+		changes: [
+			'Theme picker and sidebar footer stay fixed at the bottom-left while scrolling on every page',
+			'Desktop sidebar uses position:fixed — run npm run build after pulling to apply'
+		]
+	},
+	{
 		version: '3.5.4',
 		date: '2026-07-07',
 		title: 'SourceBans sidebar, bot IPC, and dual version checks',
