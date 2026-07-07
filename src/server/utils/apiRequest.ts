@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig, Method, AxiosError } from 'axios';
 import filterAxiosError from '@tf2autobot/filter-axios-error';
+import { externalAxiosOptions } from './httpDefaults';
 
 // eslint-disable-next-line require-jsdoc
 export async function apiRequest<B>(
@@ -20,7 +21,8 @@ export async function apiRequest<B>(
             'User-Agent': 'TF2Autobot@' + process.env.BOT_VERSION,
             ...headers
         },
-        timeout: 30000
+        timeout: 30000,
+        ...externalAxiosOptions()
     };
 
     if (params) {
