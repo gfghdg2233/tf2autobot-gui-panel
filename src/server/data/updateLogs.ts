@@ -7,6 +7,16 @@ export interface UpdateLogEntry {
 
 export const UPDATE_LOGS: UpdateLogEntry[] = [
 	{
+		version: '3.5.1',
+		date: '2026-07-07',
+		title: 'Unlisted Stock inventory IPC fix',
+		changes: [
+			'Fixed Unlisted Stock page with tf2autobot-pricedb inventory IPC format',
+			'Panel accepts both new structured payload and legacy flat inventory dict',
+			'Updated INVENTORY_IPC.md — pricedb fork includes native getInventory support'
+		]
+	},
+	{
 		version: '3.5.0',
 		date: '2026-07-07',
 		title: 'Unlisted Stock page',
