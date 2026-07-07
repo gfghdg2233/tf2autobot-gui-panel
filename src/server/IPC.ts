@@ -1,6 +1,7 @@
 import { Pricelist, PricelistItem } from "../common/types/pricelist";
 import { InventorySnapshot } from "../common/types/inventory";
 import { createLogger } from './utils/logger';
+import { traceIpcInbound, traceIpcOutbound } from './utils/ipcTrace';
 
 const log = createLogger('ipc');
 
@@ -71,6 +72,8 @@ export default class BotConnectionManager {
     }
 
     private request<T>(socket: any, emitEvent: string, responseEvent: string, ...args: unknown[]): Promise<T> {
+        const payload = args.length === 1 ? args[0] : args;
+        traceIpcOutbound(emitEvent, payload, socket?.id);
         const promise = this.waitForResponse<T>(socket, responseEvent);
         this.ipc.server.emit(socket, emitEvent, ...args);
         return promise;
@@ -231,15 +234,17 @@ export default class BotConnectionManager {
     init() {
         this.ipc.config.id = 'autobot_gui';
         this.ipc.config.retry = 1500;
-        this.ipc.config.logger = log.debug.bind(log);
+        this.ipc.config.logger = () => undefined;
         this.ipc.config.readableAll = true;
         this.ipc.config.writableAll = true;
-        this.ipc.config.silent = process.env.DEBUG_IPC !== 'true';
+        this.ipc.config.silent = true;
+        this.ipc.config.logDepth = 1;
         this.ipc.serve(() => {
             this.initiated = true;
             this.ipc.server.on(
                 'info',
                 (data, socket) => {
+                    traceIpcInbound('info', data, data?.id ?? socket?.id);
                     if (!this.bots[data.id]) {
                         log.info(`Bot connected: ${data.name ?? data.id} (${data.id})`);
                         socket.id = data.id;
@@ -255,10 +260,12 @@ export default class BotConnectionManager {
                 'pricelist',
                 (data, socket) => {
                     if(!data) {
+                        traceIpcInbound('pricelist', null, socket?.id);
                         setTimeout(() => {
                             this.ipc.server.emit(socket, 'getPricelist');
                         }, 3000);
                     } else if (socket.id && this.bots[socket.id]) {
+                        traceIpcInbound('pricelist', data, socket.id);
                         this.bots[socket.id].pricelist = data;
                         this.bots[socket.id].pricelistTS = Date.now();
                         this.resolveNextResponse(socket, 'pricelist', data);
@@ -268,12 +275,15 @@ export default class BotConnectionManager {
             const queuedEvents = ['options', 'optionsUpdated', 'itemAdded', 'itemUpdated', 'itemRemoved', 'polldata', 'chatResp', 'untradableJunkDeleted', 'inventory'];
             for (const event of queuedEvents) {
                 this.ipc.server.on(event, (data, socket) => {
+                    traceIpcInbound(event, data, socket?.id);
                     this.resolveNextResponse(socket, event, data);
                 });
             }
             this.ipc.server.on(
                 'connect',
                 (socket) => {
+                    traceIpcInbound('connect', { socketId: socket?.id });
+                    traceIpcOutbound('getInfo', null, socket?.id);
                     this.ipc.server.emit(socket, 'getInfo');
                 }
             );
@@ -281,6 +291,7 @@ export default class BotConnectionManager {
                 'socket.disconnected',
                 (socket) => {
                     const bot = this.bots[socket.id];
+                    traceIpcInbound('socket.disconnected', { socketId: socket?.id }, socket?.id);
                     if (bot) {
                         log.info(`Bot disconnected: ${bot.name} (${bot.id})`);
                     }

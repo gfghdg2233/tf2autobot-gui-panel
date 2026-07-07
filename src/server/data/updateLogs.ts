@@ -7,6 +7,16 @@ export interface UpdateLogEntry {
 
 export const UPDATE_LOGS: UpdateLogEntry[] = [
 	{
+		version: '3.5.7',
+		date: '2026-07-07',
+		title: 'Readable IPC debug output',
+		changes: [
+			'DEBUG_IPC=true now logs compact pricelist summaries instead of dumping every item object',
+			'Sample rows show SKU, buy/sell prices, and flags; set DEBUG_IPC_VERBOSE=true for full payloads',
+			'Outgoing IPC requests are traced with the same summarizer'
+		]
+	},
+	{
 		version: '3.5.6',
 		date: '2026-07-07',
 		title: 'Quieter console logging',
