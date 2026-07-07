@@ -7,6 +7,15 @@ export interface UpdateLogEntry {
 
 export const UPDATE_LOGS: UpdateLogEntry[] = [
 	{
+		version: '3.5.5',
+		date: '2026-07-07',
+		title: 'Sidebar theme picker pinned to viewport',
+		changes: [
+			'Theme selector and sidebar footer stay fixed at the bottom-left while scrolling long lists',
+			'Desktop sidebar uses sticky viewport height so nav links scroll independently above the footer'
+		]
+	},
+	{
 		version: '3.5.4',
 		date: '2026-07-07',
 		title: 'SourceBans sidebar, bot IPC, and dual version checks',
