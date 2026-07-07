@@ -7,6 +7,18 @@ export interface UpdateLogEntry {
 
 export const UPDATE_LOGS: UpdateLogEntry[] = [
 	{
+		version: '3.5.2',
+		date: '2026-07-07',
+		title: 'Pricelist, trades, and unlisted stock UI polish',
+		changes: [
+			'Removed Mann Co. approved footer; Add Item link in sidebar on pricelist',
+			'Unlisted Stock: line-by-line table, hides actively listed pricelist items',
+			'Pricelist rows show killstreak tier, sheen, and killstreaker when present',
+			'Trades: partner Steam profile name with profile and trade history links',
+			'Trades: fixed item prices — shows trade cost per item in compact rows'
+		]
+	},
+	{
 		version: '3.5.1',
 		date: '2026-07-07',
 		title: 'Unlisted Stock inventory IPC fix',

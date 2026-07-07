@@ -6,6 +6,7 @@ import getName from '../utils/getName';
 import { getImageStyle } from '../utils/getImage';
 import getStatsLink from '../utils/getStatsLink';
 import { isCurrencySku } from '../utils/currencySkus';
+import { getSkuDetails } from '../utils/skuDetails';
 
 const RECENT_TRADE_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -97,6 +98,15 @@ export function getRecentlyReceivedSkus(polldata: Record<string, unknown> | null
 	return skus;
 }
 
+function isActivelyListed(sku: string, pricelist: Pricelist): boolean {
+	const entry = pricelist?.[sku];
+	if (!entry) {
+		return false;
+	}
+
+	return entry.enabled !== false && Number(entry.intent) !== 0;
+}
+
 export function buildUnlistedItems(
 	inventory: InventorySnapshot,
 	pricelist: Pricelist,
@@ -104,11 +114,10 @@ export function buildUnlistedItems(
 	schema: SchemaManager.Schema
 ): UnlistedItem[] {
 	const recentSkus = getRecentlyReceivedSkus(polldata);
-	const listedSkus = new Set(Object.keys(pricelist ?? {}));
 	const items: UnlistedItem[] = [];
 
 	for (const [sku, assetids] of Object.entries(inventory.tradable ?? {})) {
-		if (!sku || listedSkus.has(sku) || isCurrencySku(sku)) {
+		if (!sku || isCurrencySku(sku) || isActivelyListed(sku, pricelist)) {
 			continue;
 		}
 
@@ -123,19 +132,12 @@ export function buildUnlistedItems(
 			count,
 			style: getImageStyle(sku, schema),
 			statslink: getStatsLink(sku, schema),
-			recent: recentSkus.has(sku)
+			recent: recentSkus.has(sku),
+			skuDetails: getSkuDetails(sku)
 		});
 	}
 
-	items.sort((a, b) => {
-		if (a.recent !== b.recent) {
-			return a.recent ? -1 : 1;
-		}
-		if (b.count !== a.count) {
-			return b.count - a.count;
-		}
-		return a.name.localeCompare(b.name);
-	});
+	items.sort((a, b) => a.name.localeCompare(b.name));
 
 	return items;
 }

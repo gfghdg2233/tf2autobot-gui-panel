@@ -1,6 +1,7 @@
 import {PricelistItem} from "../../common/types/pricelist";
 import SKU from "@tf2autobot/tf2-sku";
 import getStatsLink from "./getStatsLink";
+import { getSkuDetails } from "./skuDetails";
 import Currency from "@tf2autobot/tf2-currencies";
 import {getImageStyle} from "./getImage";
 import {Schema} from "@tf2autobot/tf2-schema";
@@ -19,5 +20,6 @@ export default function process(item: PricelistItem, schema: Schema, keyPrice: n
         prices.string = currency.toString();
     });
     item.style = getImageStyle(item.sku, schema);
+    item.skuDetails = getSkuDetails(item.sku);
     return item;
 }

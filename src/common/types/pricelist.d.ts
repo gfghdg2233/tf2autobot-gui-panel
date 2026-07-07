@@ -29,6 +29,11 @@ export interface PricelistItem {
     time: number;
     statslink?: string;
     bptfPrice?: LivePriceItem | null;
+    skuDetails?: {
+        killstreak: string | null;
+        sheen: string | null;
+        killstreaker: string | null;
+    };
 }
 
 interface LivePriceItem {

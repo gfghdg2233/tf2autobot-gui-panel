@@ -93,6 +93,18 @@
                                         <span class="status-pill manual" v-else>
                                             Manual
                                         </span>
+
+                                        <span class="status-pill ks" v-if="item.skuDetails?.killstreak">
+                                            {{ item.skuDetails.killstreak }}
+                                        </span>
+
+                                        <span class="status-pill sheen" v-if="item.skuDetails?.sheen">
+                                            {{ item.skuDetails.sheen }}
+                                        </span>
+
+                                        <span class="status-pill killstreaker" v-if="item.skuDetails?.killstreaker">
+                                            {{ item.skuDetails.killstreaker }}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -444,6 +456,21 @@ export default {
 .status-pill.manual {
     color: #d4c4a8;
     background: rgba(107, 93, 79, 0.35);
+}
+
+.status-pill.ks {
+    color: #ffe8c0;
+    background: rgba(196, 112, 32, 0.28);
+}
+
+.status-pill.sheen {
+    color: #d8f0c8;
+    background: rgba(90, 140, 58, 0.28);
+}
+
+.status-pill.killstreaker {
+    color: #ffd0ca;
+    background: rgba(156, 52, 40, 0.28);
 }
 
 .intent-pill.bank {

@@ -47,7 +47,11 @@
                         <h2>Trade #{{ trade.id }}</h2>
                         <p>
                             {{ trade.datetime }} ·
-                            <a :href="'https://steamcommunity.com/profiles/' + trade.partner" target="_blank" class="steam-profile">{{ trade.partner }}</a>
+                            <a :href="trade.partnerProfileUrl" target="_blank" rel="noopener" class="steam-profile">{{ trade.partnerName }}</a>
+                            <span v-if="trade.partnerTradeHistoryUrl">
+                                ·
+                                <a :href="trade.partnerTradeHistoryUrl" target="_blank" rel="noopener" class="steam-history">Trade history</a>
+                            </span>
                         </p>
                     </div>
 
@@ -63,8 +67,12 @@
                             <span>Our items</span>
                             <strong>{{ trade.hasOwnProperty('value') ? `${trade.value?.our?.keys} keys, ${trade.value?.our?.metal} metal` : '' }}</strong>
                         </div>
-                        <div class="d-flex justify-content-center flex-wrap">
-                            <grid-item v-for="item in trade.items.our" :key="item.sku" :item="Object.assign({}, items[item.sku], item)"></grid-item>
+                        <div class="trade-items-list">
+                            <trade-item-row
+                                v-for="item in trade.items.our"
+                                :key="item.sku + '-our-' + item.amount"
+                                :item="Object.assign({}, items[item.sku], item)"
+                            ></trade-item-row>
                         </div>
                     </div>
 
@@ -73,8 +81,12 @@
                             <span>Their items</span>
                             <strong>{{ trade.hasOwnProperty('value') ? `${trade.value?.their?.keys} keys, ${trade.value?.their?.metal} metal` : '' }}</strong>
                         </div>
-                        <div class="d-flex justify-content-center flex-wrap">
-                            <grid-item v-for="item in trade.items.their" :key="item.sku" :item="Object.assign({}, items[item.sku], item)"></grid-item>
+                        <div class="trade-items-list">
+                            <trade-item-row
+                                v-for="item in trade.items.their"
+                                :key="item.sku + '-their-' + item.amount"
+                                :item="Object.assign({}, items[item.sku], item)"
+                            ></trade-item-row>
                         </div>
                     </div>
                 </div>
@@ -92,7 +104,7 @@
 </template>
 
 <script lang="ts">
-import gridItem from './components/gridItem.vue';
+import tradeItemRow from './components/tradeItemRow.vue';
 
 export default {
     name: 'trades.vue',
@@ -110,7 +122,7 @@ export default {
         };
     },
     components: {
-        gridItem
+        tradeItemRow
     },
     methods: {
         loadTrades(first = 0, count = 50) {
@@ -289,9 +301,15 @@ export default {
     min-width: 0;
 }
 
-.steam-profile {
+.steam-profile,
+.steam-history {
     color: #c8dff8;
     font-weight: 700;
+}
+
+.trade-items-list {
+    display: grid;
+    gap: 0.35rem;
 }
 
 @media (max-width: 768px) {
