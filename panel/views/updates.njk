@@ -1,9 +1,12 @@
 {% extends 'templates/base.njk' %}
 
 {% block title %}Update Logs — TF2Autobot{% endblock %}
+{% block stylesheets %}{{ load_entry_tags('updates', 'css') | safe }}{% endblock %}
 
 {% block body %}
-<div class="container page-shell">
+<div class="container page-shell updates-page">
+    <div id="update-panel"></div>
+
     <div class="page-hero">
         <div>
             <p class="eyebrow mb-1">Release Notes</p>
@@ -40,3 +43,5 @@
     </div>
 </div>
 {% endblock %}
+
+{% block javascripts %}{{ load_entry_tags('updates', 'js') | safe }}{% endblock %}

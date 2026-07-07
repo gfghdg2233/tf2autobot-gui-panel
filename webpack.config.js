@@ -17,7 +17,8 @@ module.exports = {
 		base: './panel/base.ts',
 		trades: './panel/trades.ts',
 		config: './panel/config.ts',
-		unlisted: './panel/unlisted.ts'
+		unlisted: './panel/unlisted.ts',
+		updates: './panel/updates.ts'
 	},
 	resolve: {
 		// Add `.ts` as a resolvable extension.
