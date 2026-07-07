@@ -19,6 +19,11 @@ export interface UnlistedItem {
 	};
 	statslink?: string;
 	recent: boolean;
+	skuDetails?: {
+		killstreak: string | null;
+		sheen: string | null;
+		killstreaker: string | null;
+	};
 	bptfPrice?: {
 		buy?: { keys?: number; metal?: number; string?: string };
 		sell?: { keys?: number; metal?: number; string?: string };
