@@ -7,6 +7,17 @@ export interface UpdateLogEntry {
 
 export const UPDATE_LOGS: UpdateLogEntry[] = [
 	{
+		version: '3.5.3',
+		date: '2026-07-07',
+		title: 'Panel self-update from GitHub',
+		changes: [
+			'Update Logs page: check for updates and install from GitHub with one click',
+			'Auto-check and optional auto-install on a configurable schedule',
+			'Sidebar version badge highlights when a newer release is available',
+			'Uses git pull, npm install, build, and PM2 restart when configured'
+		]
+	},
+	{
 		version: '3.5.2',
 		date: '2026-07-07',
 		title: 'Pricelist, trades, and unlisted stock UI polish',

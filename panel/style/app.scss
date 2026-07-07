@@ -283,6 +283,16 @@ small {
     letter-spacing: 0.06em;
     text-transform: uppercase;
     opacity: 0.75;
+
+    &.update-available {
+        color: #ffb74d;
+        opacity: 1;
+    }
+
+    &.update-available::after {
+        content: ' · update';
+        color: #ff9800;
+    }
 }
 
 .tf2-content-wrap {

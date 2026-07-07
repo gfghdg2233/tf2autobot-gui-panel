@@ -26,7 +26,7 @@ export = function init(schemaManager: SchemaManager, botManager: BotConnectionMa
             res.render('index', { user: req.user });
         })
         .use('/config', config(schemaManager, botManager))
-        .use('/updates', updates())
+        .use('/updates', updates(botManager))
         //.use('/removeItems', removeItems)
         //.use('/clearPricelist', clearPricelist)
         //.use('/addItem', addItem(schemaManager))
