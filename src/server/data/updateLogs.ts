@@ -7,6 +7,18 @@ export interface UpdateLogEntry {
 
 export const UPDATE_LOGS: UpdateLogEntry[] = [
 	{
+		version: '3.5.4',
+		date: '2026-07-07',
+		title: 'Discord webhooks restored (TF2Autobot v15 style)',
+		changes: [
+			'Restored panel release Discord webhook (DISCORD_WEBHOOK_URL in .env)',
+			'Embed style aligned with TF2Autobot v15 discordWebhook defaults',
+			'Update Logs page shows Discord preview again; npm run notify-discord',
+			'Settings: webhook URL fields use multiline inputs; URL arrays save correctly',
+			'Added patches/tf2autobot/DISCORD_WEBHOOKS.md setup guide'
+		]
+	},
+	{
 		version: '3.5.3',
 		date: '2026-07-07',
 		title: 'Panel self-update from GitHub',
@@ -107,6 +119,10 @@ export const UPDATE_LOGS: UpdateLogEntry[] = [
 		]
 	}
 ];
+
+export function getLatestUpdateLog(): UpdateLogEntry | undefined {
+	return UPDATE_LOGS[0];
+}
 
 export function getLatestStartupLines(limit = 5): string[] {
 	const latest = UPDATE_LOGS[0];

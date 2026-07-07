@@ -7,6 +7,27 @@ function toType(source: unknown, val: string): unknown {
         return val;
     }
 
+    if (Array.isArray(source)) {
+        const trimmed = val.trim();
+        if (trimmed === '' || trimmed === '[]') {
+            return [];
+        }
+        if (trimmed.startsWith('[')) {
+            try {
+                const parsed = JSON.parse(trimmed);
+                if (Array.isArray(parsed)) {
+                    return parsed;
+                }
+            } catch {
+                // fall through to line split
+            }
+        }
+        return trimmed
+            .split(/\r?\n|,/)
+            .map((entry) => entry.trim())
+            .filter(Boolean);
+    }
+
     switch (typeof source) {
     case 'boolean':
         return val === 'true' ? true : val === 'false' ? false : source;
