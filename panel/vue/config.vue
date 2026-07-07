@@ -36,6 +36,14 @@
         </div>
 
         <div class="glass-panel settings-panel">
+            <div v-if="saveError" class="alert alert-danger settings-alert" role="alert">
+                {{ saveError }}
+            </div>
+
+            <div v-else-if="saveSuccess" class="alert alert-success settings-alert" role="alert">
+                Settings saved. Discord webhook URLs and other bot options were updated.
+            </div>
+
             <div class="settings-toolbar">
                 <div>
                     <label class="form-label">Search settings</label>
@@ -93,7 +101,9 @@ export default {
         return{
             options: {},
             search: '',
-            loading: true
+            loading: true,
+            saveSuccess: false,
+            saveError: ''
         };
     },
 
@@ -160,10 +170,22 @@ export default {
                 .finally(() => {
                     this.loading = false;
                 });
+        },
+
+        readSaveStatusFromUrl(): void {
+            const params = new URLSearchParams(window.location.search);
+
+            this.saveSuccess = params.get('saved') === '1';
+            this.saveError = params.get('error') ? decodeURIComponent(params.get('error') || '') : '';
+
+            if (this.saveSuccess || this.saveError) {
+                window.history.replaceState({}, '', '/config');
+            }
         }
     },
 
     mounted(){
+        this.readSaveStatusFromUrl();
         this.getJson();
     },
 };

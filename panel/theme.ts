@@ -1,5 +1,5 @@
 export const THEME_STORAGE_KEY = 'tf2gui-theme';
-export const DEFAULT_THEME = 'mann-co';
+export const DEFAULT_THEME = 'sourcebans';
 
 export interface ThemeOption {
     id: string;
@@ -7,7 +7,8 @@ export interface ThemeOption {
 }
 
 export const THEMES: ThemeOption[] = [
-    { id: 'mann-co', label: 'Mann Co. (Default)' },
+    { id: 'sourcebans', label: 'Console (Default)' },
+    { id: 'mann-co', label: 'Mann Co.' },
     { id: 'blu-base', label: 'BLU Base' },
     { id: 'red-fortress', label: 'RED Fortress' },
     { id: 'australium', label: 'Australium Gold' },

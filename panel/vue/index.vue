@@ -1,5 +1,5 @@
 <template>
-    <div class="container page-shell">
+    <div class="container-fluid page-shell px-0">
         <message
             v-for="(msg, index) in this.messages"
             :key="index"
@@ -13,42 +13,49 @@
         <bulk-add ref="bulkAdd" :reloadItems="loadItems" @message="this.addMessage"></bulk-add>
         <price-modal ref="priceModal" @item="itemUpdate($event)"></price-modal>
 
-        <div class="page-hero items-hero">
-            <div>
-                <p class="eyebrow mb-1">Mann Co. Pricelist</p>
-                <h1 class="mb-1">Bot Inventory Prices</h1>
-                <p>Set your buy/sell prices and compare them live against backpack.tf.</p>
-            </div>
+        <nav class="sb-breadcrumb" aria-label="Breadcrumb">
+            <a href="/">Home</a>
+            <span class="sb-breadcrumb-sep">›</span>
+            <span>Pricelist</span>
+        </nav>
 
-            <div class="hero-actions">
-                <div class="live-price-chip" :class="{ loading: livePriceLoading }">
-                    <span class="live-dot"></span>
-                    <span>{{ livePriceLoading ? 'Updating backpack.tf' : 'backpack.tf live' }}</span>
-                    <small>{{ livePriceUpdatedLabel }}</small>
+        <div class="sb-page-head">
+            <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+                <div>
+                    <h1>Pricelist</h1>
+                    <p class="sb-page-sub">{{ filteredCount }} of {{ pricelistCount }} items · {{ bptfPricedCount }} with backpack.tf prices</p>
                 </div>
 
-                <button class="btn btn-primary" @click="$refs.priceModal.show()">
-                    Add Item
-                </button>
+                <div class="hero-actions p-0">
+                    <div class="live-price-chip" :class="{ loading: livePriceLoading }">
+                        <span class="live-dot"></span>
+                        <span>{{ livePriceLoading ? 'Updating backpack.tf' : 'backpack.tf live' }}</span>
+                        <small>{{ livePriceUpdatedLabel }}</small>
+                    </div>
 
-                <button class="btn btn-outline-light" @click="$refs.bulkAdd.show()">
-                    Bulk Add
-                </button>
+                    <button class="btn btn-primary" @click="$refs.priceModal.show()">
+                        Add Item
+                    </button>
 
-                <button class="btn btn-outline-light" @click="grid = !grid">
-                    {{ grid ? 'List View' : 'Grid View' }}
-                </button>
+                    <button class="btn btn-outline-light" @click="$refs.bulkAdd.show()">
+                        Bulk Add
+                    </button>
+
+                    <button class="btn btn-outline-light" @click="grid = !grid">
+                        {{ grid ? 'List View' : 'Grid View' }}
+                    </button>
+                </div>
             </div>
         </div>
 
-        <div class="stat-grid mb-4">
+        <div class="stat-grid mb-3">
             <div class="stat-card stat-card-accent">
-                <span>Visible Items</span>
+                <span>Visible</span>
                 <strong>{{ filteredCount }}</strong>
             </div>
 
             <div class="stat-card">
-                <span>Backpack.tf Priced</span>
+                <span>backpack.tf</span>
                 <strong>{{ bptfPricedCount }}</strong>
             </div>
 
@@ -63,25 +70,25 @@
             </div>
 
             <div class="stat-card">
-                <span>Differs from bptf</span>
+                <span>Differs</span>
                 <strong>{{ mismatchCount }}</strong>
             </div>
         </div>
 
-        <div class="glass-panel mb-4 filter-panel">
-            <div class="row g-3 align-items-end">
-                <div class="col-lg-5">
-                    <label class="form-label">Search item name or SKU</label>
+        <div class="glass-panel mb-3 filter-panel">
+            <div class="toolbar-row mb-3">
+                <div class="flex-grow-1" style="min-width: 220px;">
+                    <label class="form-label">Search</label>
                     <input
-                        class="form-control form-control-lg"
+                        class="form-control"
                         v-model="search"
-                        placeholder="Example: Team Captain, 5021;6, unusual..."
+                        placeholder="Item name or SKU..."
                     />
                 </div>
 
-                <div class="col-lg-2">
+                <div style="min-width: 140px;">
                     <label class="form-label">Intent</label>
-                    <select class="form-select form-select-lg" v-model="intentFilter">
+                    <select class="form-select" v-model="intentFilter">
                         <option value="all">All intents</option>
                         <option value="2">Bank</option>
                         <option value="1">Sell only</option>
@@ -89,22 +96,35 @@
                     </select>
                 </div>
 
-                <div class="col-lg-2">
-                    <label class="form-label">Pricing</label>
-                    <select class="form-select form-select-lg" v-model="pricingFilter">
-                        <option value="all">All pricing</option>
-                        <option value="auto">Autoprice</option>
-                        <option value="manual">Manual</option>
-                        <option value="disabled">Disabled</option>
-                        <option value="mismatch">Differs from bptf</option>
-                    </select>
-                </div>
-
-                <div class="col-lg-3">
-                    <button class="btn btn-soft w-100" type="button" @click="loadLivePrices(true)" :disabled="livePriceLoading || pricelistCount === 0">
-                        {{ livePriceLoading ? 'Refreshing prices...' : 'Refresh backpack.tf prices' }}
+                <div>
+                    <label class="form-label">&nbsp;</label>
+                    <button class="btn btn-primary d-block" type="button" @click="loadLivePrices(true)" :disabled="livePriceLoading || pricelistCount === 0">
+                        {{ livePriceLoading ? 'Refreshing…' : 'Apply' }}
                     </button>
                 </div>
+            </div>
+
+            <div class="filter-pill-bar" role="group" aria-label="Pricing filters">
+                <button type="button" class="filter-pill" :class="{ active: pricingFilter === 'all' }" @click="pricingFilter = 'all'">
+                    <span class="filter-pill-dot"></span>
+                    All
+                </button>
+                <button type="button" class="filter-pill" :class="{ active: pricingFilter === 'auto' }" @click="pricingFilter = 'auto'">
+                    <span class="filter-pill-dot"></span>
+                    Autoprice
+                </button>
+                <button type="button" class="filter-pill" :class="{ active: pricingFilter === 'manual' }" @click="pricingFilter = 'manual'">
+                    <span class="filter-pill-dot"></span>
+                    Manual
+                </button>
+                <button type="button" class="filter-pill" :class="{ active: pricingFilter === 'disabled' }" @click="pricingFilter = 'disabled'">
+                    <span class="filter-pill-dot"></span>
+                    Disabled
+                </button>
+                <button type="button" class="filter-pill" :class="{ active: pricingFilter === 'mismatch' }" @click="pricingFilter = 'mismatch'">
+                    <span class="filter-pill-dot"></span>
+                    Differs from bptf
+                </button>
             </div>
         </div>
 

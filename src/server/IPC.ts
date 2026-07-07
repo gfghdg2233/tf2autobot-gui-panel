@@ -73,21 +73,44 @@ export default class BotConnectionManager {
         return promise;
     }
 
-    static cleanItem(item){
+    static cleanItem(item: object) {
+        const raw = item as Record<string, unknown>;
+        const note = raw.note && typeof raw.note === 'object' && !Array.isArray(raw.note)
+            ? raw.note as Record<string, unknown>
+            : {};
+        const buy = raw.buy && typeof raw.buy === 'object' && !Array.isArray(raw.buy)
+            ? raw.buy as Record<string, unknown>
+            : {};
+        const sell = raw.sell && typeof raw.sell === 'object' && !Array.isArray(raw.sell)
+            ? raw.sell as Record<string, unknown>
+            : {};
+
         return {
-            sku: item.sku,
-            enabled: item.enabled,
-            autoprice: item.autoprice,
-            min: item.min,
-            max: item.max,
-            intent: parseInt(item?.intent),
-            buy: { keys: item.buy?.keys, metal: item.buy?.metal },
-            sell: { keys: item.sell?.keys, metal: item.sell?.metal },
-            promoted: item.promoted,
-            group: item.group,
-            note: { buy: item.note.buy, sell: item.note.sell },
-            isPartialPriced: item.isPartialPriced
-        }
+            sku: raw.sku,
+            enabled: raw.enabled,
+            autoprice: raw.autoprice,
+            min: raw.min,
+            max: raw.max,
+            intent: Number.parseInt(String(raw.intent ?? ''), 10),
+            buy: { keys: buy.keys, metal: buy.metal },
+            sell: { keys: sell.keys, metal: sell.metal },
+            promoted: raw.promoted,
+            group: raw.group,
+            note: { buy: note.buy ?? '', sell: note.sell ?? '' },
+            isPartialPriced: raw.isPartialPriced
+        };
+    }
+
+    listBots(): Array<{ id: string; name: string; admins?: string[] }> {
+        return Object.values(this.bots).map((bot) => ({
+            id: bot.id,
+            name: bot.name,
+            admins: bot.admins
+        }));
+    }
+
+    isReady(): boolean {
+        return this.initiated;
     }
 
     getBotPricelist(id: string) {
@@ -215,7 +238,7 @@ export default class BotConnectionManager {
                 'info',
                 (data, socket) => {
                     if (!this.bots[data.id]) {
-                        console.log('bot connected: ' + data.id);
+                        console.log(`bot connected: ${data.name ?? data.id} (${data.id})`);
                         socket.id = data.id;
                         this.bots[data.id] = {
                             socket,
@@ -254,10 +277,19 @@ export default class BotConnectionManager {
             this.ipc.server.on(
                 'socket.disconnected',
                 (socket) => {
+                    const bot = this.bots[socket.id];
+                    if (bot) {
+                        console.log(`bot disconnected: ${bot.name} (${bot.id})`);
+                    }
                     delete this.bots[socket.id];
                 }
             )
         });
         this.ipc.server.start();
+        const ipcPath = process.platform === 'win32'
+            ? '\\\\.\\pipe\\app.autobot_gui'
+            : '/tmp/app.autobot_gui';
+        console.log(`IPC server listening (id: autobot_gui, path: ${ipcPath})`);
+        console.log('Start tf2autobot-pricedb with IPC=true in the bot .env, then wait for "bot connected".');
     }
 }

@@ -1,10 +1,32 @@
 import express, { Router } from 'express';
 import SchemaManager from "@tf2autobot/tf2-schema";
 import BotConnectionManager from "../IPC";
+import { normalizeBotOptions } from '../utils/normalizeBotOptions';
 
 function toType(source: unknown, val: string): unknown {
     if (source === null || source === undefined) {
         return val;
+    }
+
+    if (Array.isArray(source)) {
+        const trimmed = val.trim();
+        if (trimmed === '' || trimmed === '[]') {
+            return [];
+        }
+        if (trimmed.startsWith('[')) {
+            try {
+                const parsed = JSON.parse(trimmed);
+                if (Array.isArray(parsed)) {
+                    return parsed;
+                }
+            } catch {
+                // fall through to line split
+            }
+        }
+        return trimmed
+            .split(/\r?\n|,/)
+            .map((entry) => entry.trim())
+            .filter(Boolean);
     }
 
     switch (typeof source) {
@@ -95,7 +117,13 @@ export default function config(_schemaManager: SchemaManager, botManager: BotCon
                 }
                 setNestedOption(botOptions, key, req.body[key]);
             }
-            await botManager.updateOptions(req.session.bot, botOptions);
+            normalizeBotOptions(botOptions);
+            const result = await botManager.updateOptions(req.session.bot, botOptions);
+            const resultMessage = typeof result === 'string' ? result : '';
+
+            if (resultMessage.startsWith('❌')) {
+                return res.redirect(`/config?error=${encodeURIComponent(resultMessage)}`);
+            }
 
             const miscSettings = botOptions.miscSettings as Record<string, unknown> | undefined;
             const deleteJunk = miscSettings?.deleteUntradableJunk as Record<string, unknown> | undefined;
@@ -107,7 +135,7 @@ export default function config(_schemaManager: SchemaManager, botManager: BotCon
                 }
             }
 
-            res.redirect('/config');
+            res.redirect('/config?saved=1');
         } catch (err) {
             console.error('Failed to save bot settings:', err);
             next(err);

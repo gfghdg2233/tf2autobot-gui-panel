@@ -7,6 +7,18 @@ export interface UpdateLogEntry {
 
 export const UPDATE_LOGS: UpdateLogEntry[] = [
 	{
+		version: '3.5.4',
+		date: '2026-07-07',
+		title: 'SourceBans sidebar, bot IPC, and dual version checks',
+		changes: [
+			'Left sidebar navigation with SourceBans-style console theme',
+			'Panel and bot GitHub version checks side by side on Updates page',
+			'Bot update scripts (update-bot.ps1 / update-bot.sh) with PM2 restart',
+			'IPC hardening, /health/bot endpoint, and Windows setup-bot.ps1',
+			'Sidebar shows Panel/Bot version chips and IPC connection status'
+		]
+	},
+	{
 		version: '3.5.3',
 		date: '2026-07-07',
 		title: 'Panel self-update from GitHub',

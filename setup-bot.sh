@@ -4,7 +4,7 @@ set -euo pipefail
 
 GUI_DIR="$(cd "$(dirname "$0")" && pwd)"
 BOT_DIR="$(dirname "$GUI_DIR")/tf2autobot"
-BOT_REPO="https://github.com/TF2-Price-DB/tf2autobot-pricedb.git"
+BOT_REPO="https://github.com/uwu6967/tf2autobot-pricedb.git"
 ACCOUNT_DIR="$GUI_DIR/files"
 
 echo ""
