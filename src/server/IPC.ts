@@ -1,4 +1,5 @@
 import { Pricelist, PricelistItem } from "../common/types/pricelist";
+import { InventorySnapshot } from "../common/types/inventory";
 
 const { IPCModule } = require('node-ipc');
 
@@ -189,6 +190,18 @@ export default class BotConnectionManager {
         });
     }
 
+    getInventory(id: string) {
+        return new Promise<InventorySnapshot>((resolve, reject) => {
+            if (!this.bots[id]) {
+                reject('no bot found');
+                return;
+            }
+            this.request<InventorySnapshot>(this.bots[id].socket, 'getInventory', 'inventory')
+                .then(resolve)
+                .catch(reject);
+        });
+    }
+
     init() {
         this.ipc.config.id = 'autobot_gui';
         this.ipc.config.retry = 1500;
@@ -226,7 +239,7 @@ export default class BotConnectionManager {
                     }
                 }
             );
-            const queuedEvents = ['options', 'optionsUpdated', 'itemAdded', 'itemUpdated', 'itemRemoved', 'polldata', 'chatResp', 'untradableJunkDeleted'];
+            const queuedEvents = ['options', 'optionsUpdated', 'itemAdded', 'itemUpdated', 'itemRemoved', 'polldata', 'chatResp', 'untradableJunkDeleted', 'inventory'];
             for (const event of queuedEvents) {
                 this.ipc.server.on(event, (data, socket) => {
                     this.resolveNextResponse(socket, event, data);

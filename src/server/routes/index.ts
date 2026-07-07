@@ -13,6 +13,7 @@ import search from './search';
 import bot from './bot';
 import config from './config';
 import updates from './updates';
+import unlisted from './unlisted';
 
 import SchemaManager from "@tf2autobot/tf2-schema";
 import BotConnectionManager from "../IPC";
@@ -31,6 +32,7 @@ export = function init(schemaManager: SchemaManager, botManager: BotConnectionMa
         //.use('/addItem', addItem(schemaManager))
         //.use('/addItems', addItems(schemaManager))
         .use('/trades', trades(schemaManager, botManager))
+        .use('/unlisted', unlisted(schemaManager, botManager))
         //.use('/changeItem', changeItem)
         .use('/search', search(schemaManager))
         //.use('/getItems', getItems(schemaManager))
