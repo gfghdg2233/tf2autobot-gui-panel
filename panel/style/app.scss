@@ -86,9 +86,14 @@ small {
 /* ── Shell / sidebar layout ── */
 
 .tf2-shell {
+    --tf2-sidebar-width: 15.5rem;
     min-height: 100vh;
     display: flex;
     flex-direction: row;
+}
+
+.sb-shell {
+    --tf2-sidebar-width: 14.5rem;
 }
 
 .tf2-sidebar-toggle {
@@ -118,7 +123,7 @@ small {
 }
 
 .tf2-sidebar {
-    width: 15.5rem;
+    width: var(--tf2-sidebar-width);
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
@@ -128,7 +133,27 @@ small {
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.35);
 }
 
+@media (min-width: 992px) {
+    .tf2-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 1030;
+        min-height: 0;
+        height: auto;
+        max-height: none;
+        overflow: hidden;
+    }
+
+    .tf2-content-wrap {
+        margin-left: var(--tf2-sidebar-width);
+        width: calc(100% - var(--tf2-sidebar-width));
+    }
+}
+
 .tf2-sidebar-brand {
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -185,6 +210,7 @@ small {
 
 .tf2-sidebar-nav {
     flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     gap: 0.15rem;
@@ -266,6 +292,7 @@ small {
 
 .tf2-sidebar-bottom {
     margin-top: auto;
+    flex-shrink: 0;
     padding: 0.75rem 0.55rem 1rem;
     border-top: 1px solid rgba(255, 255, 255, 0.06);
     display: flex;
