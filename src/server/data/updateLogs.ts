@@ -7,6 +7,15 @@ export interface UpdateLogEntry {
 
 export const UPDATE_LOGS: UpdateLogEntry[] = [
 	{
+		version: '3.5.6',
+		date: '2026-07-07',
+		title: 'Fixed sidebar pinned to screen edge',
+		changes: [
+			'Desktop sidebar is now position:fixed so the theme picker stays at the bottom-left while lists scroll',
+			'Main content offset matches sidebar width (requires npm run build to apply CSS)'
+		]
+	},
+	{
 		version: '3.5.5',
 		date: '2026-07-07',
 		title: 'Sidebar theme picker pinned to viewport',
