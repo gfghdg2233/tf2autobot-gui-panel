@@ -47,7 +47,6 @@ export default {
     },
     watch: {
         name(newName: string, oldName: string) {
-            console.log('name: ' + this.name)
             this.searchDisable = false;
             if (newName.trim() !== oldName.trim() && newName.trim() !== '') {
                 fetch('/search?text=' + encodeURI(newName)) // TODO: text=item

@@ -7,6 +7,16 @@ export interface UpdateLogEntry {
 
 export const UPDATE_LOGS: UpdateLogEntry[] = [
 	{
+		version: '3.5.6',
+		date: '2026-07-07',
+		title: 'Quieter console logging',
+		changes: [
+			'IPC debug spam silenced by default (set DEBUG_IPC=true to trace socket traffic)',
+			'Server logs use scoped prefixes and timestamps via console-stamp',
+			'Removed browser debug noise from item search and profit date pickers'
+		]
+	},
+	{
 		version: '3.5.5',
 		date: '2026-07-07',
 		title: 'Sidebar theme pinned to screen on all tabs',

@@ -171,7 +171,6 @@ document.getElementById('startTime').addEventListener('onOk', function() {
 		app.startTimeDialog.toggle();
 	} else {
 		app.startTime = false;
-		console.log(app.startDateDialog.time.utc().startOf('day').unix());
 		const time = app.startTimeDialog.time;
 		total = app.startDateDialog.time.utc().startOf('day').unix(); // add date to total
 		total += time.startOf('minute').unix() - time.startOf('day').unix(); // add time to total
@@ -189,7 +188,6 @@ document.getElementById('endTime').addEventListener('onOk', function() {
 		app.endTimeDialog.toggle();
 	} else {
 		app.endTime = false;
-		console.log(app.endDateDialog.time.utc().startOf('day').unix());
 		const time = app.endTimeDialog.time;
 		total = app.endDateDialog.time.utc().startOf('day').unix(); // add date to total
 		total += time.startOf('minute').unix() - time.startOf('day').unix(); // add time to total
