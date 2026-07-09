@@ -15,14 +15,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/TF2Autobot/tf2autobot-gui.git"
+    "url": "https://github.com/uwu6967/tf2autobot-gui-panel.git"
   },
   "author": "Zeus_Junior/76561198144346135",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/TF2Autobot/tf2autobot-gui/issues"
+    "url": "https://github.com/uwu6967/tf2autobot-gui-panel/issues"
   },
-  "homepage": "https://github.com/TF2Autobot/tf2autobot-gui#readme",
+  "homepage": "https://github.com/uwu6967/tf2autobot-gui-panel#readme",
   "dependencies": {
     "@tf2autobot/filter-axios-error": "^1.5.2",
     "@tf2autobot/tf2-currencies": "^2.0.1",
