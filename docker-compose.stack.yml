@@ -1,0 +1,43 @@
+# Panel + trading bot. Clone tf2autobot-pricedb next to this repo:
+#   git clone https://github.com/uwu6967/tf2autobot-pricedb.git ../tf2autobot-pricedb
+# Or set BOT_BUILD_CONTEXT to your bot checkout path.
+services:
+  panel:
+    build: .
+    image: tf2autobot-gui-panel:local
+    ports:
+      - "${PORT:-3000}:3000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    volumes:
+      - ipc-tmp:/tmp
+      - shared-files:/app/files
+    restart: unless-stopped
+
+  bot:
+    build:
+      context: ${BOT_BUILD_CONTEXT:-../tf2autobot-pricedb}
+      dockerfile: Dockerfile
+    image: tf2autobot-pricedb:local
+    env_file:
+      - path: ${BOT_ENV_FILE:-../tf2autobot-pricedb/.env}
+        required: true
+    environment:
+      NODE_ENV: production
+      DOCKER: "1"
+      IPC: "true"
+    volumes:
+      - ipc-tmp:/tmp
+      - shared-files:/app/files
+    depends_on:
+      panel:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  ipc-tmp:
+  shared-files:

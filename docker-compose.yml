@@ -1,0 +1,21 @@
+# Web panel only. For panel + bot together, use docker-compose.stack.yml
+services:
+  panel:
+    build: .
+    image: tf2autobot-gui-panel:local
+    ports:
+      - "${PORT:-3000}:3000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    volumes:
+      - ipc-tmp:/tmp
+      - panel-files:/app/files
+    restart: unless-stopped
+
+volumes:
+  ipc-tmp:
+  panel-files:

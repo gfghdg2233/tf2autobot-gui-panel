@@ -62,6 +62,45 @@ Latest release: [v3.5.6](https://github.com/uwu6967/tf2autobot-gui-panel/release
 
 ---
 
+## Docker
+
+The panel can run in Docker on its own, or together with [**tf2autobot-pricedb**](https://github.com/uwu6967/tf2autobot-pricedb) via a shared IPC socket.
+
+### Panel only
+
+```bash
+cp template.env .env
+# Edit .env — set SESSION_SECRET and API_KEY if using Steam auth
+docker compose up -d --build
+```
+
+Open **http://localhost:3000**. The bot must still run separately with access to the same `/tmp` IPC socket (see the bot repo’s Docker docs).
+
+### Panel + bot (recommended)
+
+Clone both repositories as siblings, configure each `.env`, then start the stack from this directory:
+
+```bash
+git clone https://github.com/uwu6967/tf2autobot-gui-panel.git
+git clone https://github.com/uwu6967/tf2autobot-pricedb.git
+cd tf2autobot-gui-panel
+cp template.env .env
+cp ../tf2autobot-pricedb/.env.example ../tf2autobot-pricedb/.env
+# Edit both .env files (panel: SESSION_SECRET; bot: Steam credentials, IPC=true)
+docker compose -f docker-compose.stack.yml up -d --build
+```
+
+The stack shares a `/tmp` volume for `node-ipc` and a `files/` volume for bot data. Start the panel before the bot (the compose file handles this automatically).
+
+| File | Purpose |
+|------|---------|
+| `Dockerfile` | Production image for the web panel |
+| `docker-compose.yml` | Panel service only |
+| `docker-compose.stack.yml` | Panel + bot together |
+| `.env.docker.example` | Minimal panel env template for Docker |
+
+---
+
 ## Environment variables
 
 Copy `template.env` to `.env`. Never commit `.env`.
