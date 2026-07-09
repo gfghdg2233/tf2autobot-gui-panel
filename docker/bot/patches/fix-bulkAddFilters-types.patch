@@ -1,0 +1,31 @@
+diff --git a/src/classes/Commands/sub-classes/bulkAddFilters.ts b/src/classes/Commands/sub-classes/bulkAddFilters.ts
+index 07dbf46..898d763 100644
+--- a/src/classes/Commands/sub-classes/bulkAddFilters.ts
++++ b/src/classes/Commands/sub-classes/bulkAddFilters.ts
+@@ -29,6 +29,8 @@ export const BULK_ADD_CATEGORIES = [
+ 
+ export type BulkAddCategory = (typeof BULK_ADD_CATEGORIES)[number];
+ 
++type SkuItem = ReturnType<typeof SKU.fromString> & { strange?: boolean };
++
+ export function normalizeBulkAddCategory(raw: string): BulkAddCategory | null {
+     const value = raw.toLowerCase().trim().replace(/s$/, '');
+ 
+@@ -49,7 +51,7 @@ function isJunkSku(sku: string, bot: Bot): boolean {
+         return true;
+     }
+ 
+-    let item: SKU.Item;
++    let item: SkuItem;
+     try {
+         item = SKU.fromString(sku);
+     } catch {
+@@ -65,7 +67,7 @@ function matchesCategory(sku: string, category: BulkAddCategory, bot: Bot): bool
+         return !isJunkSku(sku, bot);
+     }
+ 
+-    let item: SKU.Item;
++    let item: SkuItem;
+     try {
+         item = SKU.fromString(sku);
+     } catch {

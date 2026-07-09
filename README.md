@@ -78,16 +78,20 @@ Open **http://localhost:3000**. The bot must still run separately with access to
 
 ### Panel + bot (recommended)
 
-Clone both repositories as siblings, configure each `.env`, then start the stack from this directory:
+Configure env files, then start the stack from this directory:
 
 ```bash
-git clone https://github.com/uwu6967/tf2autobot-gui-panel.git
-git clone https://github.com/uwu6967/tf2autobot-pricedb.git
-cd tf2autobot-gui-panel
 cp template.env .env
-cp ../tf2autobot-pricedb/.env.example ../tf2autobot-pricedb/.env
-# Edit both .env files (panel: SESSION_SECRET; bot: Steam credentials, IPC=true)
+cp docker/bot/.env.example docker/bot/.env
+# Edit .env (panel) and docker/bot/.env (bot Steam credentials, IPC=true)
 docker compose -f docker-compose.stack.yml up -d --build
+```
+
+The stack clones [**tf2autobot-pricedb**](https://github.com/uwu6967/tf2autobot-pricedb) at image build time (override with `BOT_REPO` / `BOT_REF`). To build from a local bot checkout instead:
+
+```bash
+export BOT_BUILD_CONTEXT=../tf2autobot-pricedb
+# Use a custom compose override or edit docker-compose.stack.yml context
 ```
 
 The stack shares a `/tmp` volume for `node-ipc` and a `files/` volume for bot data. Start the panel before the bot (the compose file handles this automatically).
@@ -95,9 +99,11 @@ The stack shares a `/tmp` volume for `node-ipc` and a `files/` volume for bot da
 | File | Purpose |
 |------|---------|
 | `Dockerfile` | Production image for the web panel |
+| `docker/bot/Dockerfile` | Bot image built from GitHub (used by the stack) |
 | `docker-compose.yml` | Panel service only |
 | `docker-compose.stack.yml` | Panel + bot together |
 | `.env.docker.example` | Minimal panel env template for Docker |
+| `docker/bot/.env.example` | Bot env template for the stack |
 
 ---
 

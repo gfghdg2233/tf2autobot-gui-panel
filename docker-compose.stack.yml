@@ -20,11 +20,14 @@ services:
 
   bot:
     build:
-      context: ${BOT_BUILD_CONTEXT:-../tf2autobot-pricedb}
+      context: ./docker/bot
       dockerfile: Dockerfile
+      args:
+        BOT_REPO: ${BOT_REPO:-https://github.com/uwu6967/tf2autobot-pricedb.git}
+        BOT_REF: ${BOT_REF:-master}
     image: tf2autobot-pricedb:local
     env_file:
-      - path: ${BOT_ENV_FILE:-../tf2autobot-pricedb/.env}
+      - path: ${BOT_ENV_FILE:-./docker/bot/.env}
         required: true
     environment:
       NODE_ENV: production
