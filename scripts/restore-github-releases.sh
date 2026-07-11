@@ -38,6 +38,7 @@ declare -A TAGS=(
     [v3.5.9]=97ee2bb
     [v3.6.0]=309cfa3
     [v3.6.1]=15c3661
+    [v3.6.2]=9939f6f
 )
 
 declare -A TITLES=(
@@ -58,9 +59,10 @@ declare -A TITLES=(
     [v3.5.9]="v3.5.9 - Pricedb pricelist array compatibility"
     [v3.6.0]="v3.6.0 - Listing queue and manual pricelist updates"
     [v3.6.1]="v3.6.1 - Unlisted list fixes for asset-keyed items"
+    [v3.6.2]="v3.6.2 - Asset-id IPC and panel self-update fixes"
 )
 
-for tag in v3.3.3 v3.4.0 v3.4.1 v3.4.2 v3.4.3 v3.5.0 v3.5.1 v3.5.2 v3.5.3 v3.5.4 v3.5.5 v3.5.6 v3.5.7 v3.5.8 v3.5.9 v3.6.0 v3.6.1; do
+for tag in v3.3.3 v3.4.0 v3.4.1 v3.4.2 v3.4.3 v3.5.0 v3.5.1 v3.5.2 v3.5.3 v3.5.4 v3.5.5 v3.5.6 v3.5.7 v3.5.8 v3.5.9 v3.6.0 v3.6.1 v3.6.2; do
     sha="${TAGS[$tag]}"
     notes="$NOTES_DIR/${tag}.md"
 
@@ -92,4 +94,4 @@ for tag in v3.3.3 v3.4.0 v3.4.1 v3.4.2 v3.4.3 v3.5.0 v3.5.1 v3.5.2 v3.5.3 v3.5.4
         --notes-file "$notes"
 done
 
-echo "Done. Latest release should be v3.6.1 under $LOGIN."
+echo "Done. Latest release should be v3.6.2 under $LOGIN."

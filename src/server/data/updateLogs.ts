@@ -7,6 +7,17 @@ export interface UpdateLogEntry {
 
 export const UPDATE_LOGS: UpdateLogEntry[] = [
 	{
+		version: '3.6.2',
+		date: '2026-07-11',
+		title: 'Asset-id IPC, panel self-update fixes, and version checks',
+		changes: [
+			'Pass backpack asset ids over IPC when listing single-asset unlisted items for tf2autobot-pricedb priceKey support',
+			'findPricelistEntryBySkuOrId matches asset-keyed pricelist entries',
+			'Panel self-update uses PM2 process name "panel" by default and recovers stale update jobs after 30 minutes',
+			'Added verify-version, verify-release-author, and pricedb asset-id smoke tests'
+		]
+	},
+	{
 		version: '3.6.1',
 		date: '2026-07-11',
 		title: 'Unlisted list fixes for asset-keyed and manual-priced items',
