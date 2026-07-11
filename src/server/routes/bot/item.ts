@@ -5,7 +5,15 @@ import BotConnectionManager from "../../IPC";
 import processPricelistItem from "../../utils/processPricelistItem";
 import { getKeyPrice } from "../../utils/keyPrice";
 import {checkItem} from "./checkItem";
-import { getBotItemError, isAlreadyPricedError, isPricelistItem } from '../../utils/botItemResponse';
+import {
+	formatBotItemError,
+	getBotItemError,
+	isAlreadyPricedError,
+	isAutopriceUnavailableError,
+	isPricelistItem,
+	prepareItemForSave
+} from '../../utils/botItemResponse';
+import { removeListingQueueItem } from '../../app/listingQueue';
 
 async function savePricelistItem(
 	botManager: BotConnectionManager,
@@ -23,7 +31,23 @@ async function savePricelistItem(
 		error = getBotItemError(ret);
 	}
 
-	return { ret, error };
+	if (error && isAutopriceUnavailableError(error) && item.autoprice) {
+		const manualItem = JSON.parse(JSON.stringify(item)) as PricelistItem;
+		manualItem.autoprice = false;
+		prepareItemForSave(manualItem);
+
+		ret = mode === 'add'
+			? await botManager.addItem(botId, manualItem)
+			: await botManager.updateItem(botId, manualItem);
+		error = getBotItemError(ret);
+
+		if (mode === 'add' && error && isAlreadyPricedError(error)) {
+			ret = await botManager.updateItem(botId, manualItem);
+			error = getBotItemError(ret);
+		}
+	}
+
+	return { ret, error: error ? formatBotItemError(error) : null };
 }
 
 export = function (schemaManager: SchemaManager, botManager: BotConnectionManager): Router {
@@ -41,6 +65,7 @@ export = function (schemaManager: SchemaManager, botManager: BotConnectionManage
 
             const keyPrice = await getKeyPrice();
             if (isPricelistItem(ret)) {
+				await removeListingQueueItem(req.session.bot, ret.sku).catch(() => undefined);
                 res.json(processPricelistItem(ret, schema, keyPrice));
             } else {
                 res.status(500).json({ success: 0, msg: { type: 'error', message: 'Failed to add item' } });
@@ -62,6 +87,7 @@ export = function (schemaManager: SchemaManager, botManager: BotConnectionManage
 
             const keyPrice = await getKeyPrice();
             if (isPricelistItem(ret)) {
+				await removeListingQueueItem(req.session.bot, ret.sku).catch(() => undefined);
                 res.json(processPricelistItem(ret, schema, keyPrice));
             } else {
                 res.status(500).json({ success: 0, msg: { type: 'error', message: 'Failed to update item' } });

@@ -34,6 +34,10 @@
                     </div>
                 </div>
 
+                <div class="autoprice-warning" v-if="showAutopriceWarning">
+                    Autoprice is not available for this item. Turn off autoprice and set a manual price.
+                </div>
+
                 <div class="switch-row mb-4">
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" name="enabled" id="enabled" v-model="item.enabled" :disabled="!edit"/>
@@ -138,7 +142,23 @@ export default {
             saving: false
         };
     },
+    computed: {
+        showAutopriceWarning(): boolean {
+            if (!this.item.autoprice) {
+                return false;
+            }
+
+            const status = this.item.bptfPrice?.status;
+            return status === 'unavailable' || status === 'unpriced' || status === 'partial';
+        }
+    },
     methods: {
+        normalizeItem(item: PricelistItem): PricelistItem {
+            item.buy = item.buy || { keys: 0, metal: 0 };
+            item.sell = item.sell || { keys: 0, metal: 0 };
+            item.note = item.note || { buy: null, sell: null };
+            return item;
+        },
         itemSelected(e: any) {
             this.item.sku = e.sku;
             this.item.name = e.name;
@@ -160,12 +180,13 @@ export default {
             this.edit = edit;
             if (edit) {
                 if (item) {
-                    this.item = item as PricelistItem;
+                    this.item = this.normalizeItem(item as PricelistItem);
                 } else {
                     this.edit = false;
                 }
             } else if (item) {
                 Object.assign(this.item, item);
+                this.normalizeItem(this.item);
             }
             this.modal.show();
         },
@@ -218,6 +239,9 @@ export default {
 
                     if (!res.ok || payload?.success === 0) {
                         const message = payload?.msg?.message || (typeof payload === 'string' ? payload : 'Failed to save item');
+                        if (/autoprice is not available/i.test(message)) {
+                            this.item.autoprice = false;
+                        }
                         this.$emit('error', message);
                         return;
                     }
@@ -320,6 +344,16 @@ export default {
 .apply-bptf-btn {
     margin-top: 0.55rem;
     width: 100%;
+}
+
+.autoprice-warning {
+    margin-bottom: 1rem;
+    padding: 0.75rem 0.9rem;
+    color: #ffe8c0;
+    background: rgba(196, 112, 32, 0.2);
+    border: 2px solid;
+    border-color: #c47020 #14110f #14110f #c47020;
+    font-size: 0.88rem;
 }
 
 input:disabled {

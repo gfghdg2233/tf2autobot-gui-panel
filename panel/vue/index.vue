@@ -11,7 +11,7 @@
         </message>
 
         <bulk-add ref="bulkAdd" :reloadItems="loadItems" @message="this.addMessage"></bulk-add>
-        <price-modal ref="priceModal" @item="itemUpdate($event)"></price-modal>
+        <price-modal ref="priceModal" @item="itemUpdate($event)" @error="onPriceModalError"></price-modal>
 
         <nav class="sb-breadcrumb" aria-label="Breadcrumb">
             <a href="/">Home</a>
@@ -23,7 +23,8 @@
             <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
                 <div>
                     <h1>Pricelist</h1>
-                    <p class="sb-page-sub">{{ filteredCount }} of {{ pricelistCount }} items · {{ bptfPricedCount }} with backpack.tf prices</p>
+                    <p class="sb-page-sub" v-if="pageTab === 'pricelist'">{{ filteredCount }} of {{ pricelistCount }} items · {{ bptfPricedCount }} with backpack.tf prices</p>
+                    <p class="sb-page-sub" v-else>{{ queueCount }} item(s) waiting to be listed manually</p>
                 </div>
 
                 <div class="hero-actions p-0">
@@ -48,6 +49,19 @@
             </div>
         </div>
 
+        <div class="filter-pill-bar page-tab-bar mb-3" role="tablist" aria-label="Pricelist views">
+            <button type="button" class="filter-pill" :class="{ active: pageTab === 'pricelist' }" @click="pageTab = 'pricelist'">
+                <span class="filter-pill-dot"></span>
+                Pricelist
+            </button>
+            <button type="button" class="filter-pill" :class="{ active: pageTab === 'queue' }" @click="openQueueTab()">
+                <span class="filter-pill-dot"></span>
+                Queue
+                <span class="queue-count-badge" v-if="queueCount > 0">{{ queueCount }}</span>
+            </button>
+        </div>
+
+        <template v-if="pageTab === 'pricelist'">
         <div class="stat-grid mb-3">
             <div class="stat-card stat-card-accent">
                 <span>Visible</span>
@@ -143,6 +157,18 @@
             :multi-select="[]"
             @itemClick="$refs.priceModal.show(true, $event)"
         ></item-list>
+        </template>
+
+        <listing-queue
+            v-else
+            :items="queueItems"
+            :loading="queueLoading"
+            @price="openQueueItemPrice"
+            @listed="onQueueItemListed"
+            @removed="onQueueItemRemoved"
+            @error="onQueueError"
+            @reload="loadQueue"
+        ></listing-queue>
     </div>
 </template>
 
@@ -152,7 +178,9 @@ import bulkAdd from './parts/bulkAddModal.vue';
 import itemGrid from './parts/itemGrid.vue';
 import itemList from './parts/itemList.vue';
 import priceModal from './parts/priceModal.vue';
+import listingQueue from './parts/listingQueue.vue';
 import { PricelistItem } from '../../common/types/pricelist';
+import { ListingQueueItem } from '../../common/types/queue';
 
 interface Message {
     msg: string;
@@ -169,7 +197,8 @@ export default {
         message,
         bulkAdd,
         itemGrid,
-        itemList
+        itemList,
+        listingQueue
     },
 
     data() {
@@ -183,7 +212,10 @@ export default {
             livePriceMap: {} as LivePriceMap,
             livePriceUpdatedAt: 0,
             livePriceLoading: false,
-            livePriceTimer: null as any
+            livePriceTimer: null as any,
+            pageTab: 'pricelist' as 'pricelist' | 'queue',
+            queueItems: [] as ListingQueueItem[],
+            queueLoading: false
         };
     },
 
@@ -218,6 +250,10 @@ export default {
 
         mismatchCount(): number {
             return this.pricelistArray.filter((item: any) => this.priceDiffersFromBptf(item)).length;
+        },
+
+        queueCount(): number {
+            return this.queueItems.length;
         },
 
         livePriceUpdatedLabel(): string {
@@ -396,11 +432,69 @@ export default {
             }
 
             this.loadLivePrices();
+            this.loadQueue();
+        },
+
+        onPriceModalError(message: string) {
+            this.addMessage({ msg: message, type: 'Danger' });
+        },
+
+        openQueueTab() {
+            this.pageTab = 'queue';
+            this.loadQueue();
+        },
+
+        loadQueue() {
+            this.queueLoading = true;
+
+            fetch('/pricelist/queue')
+                .then((response) => response.json())
+                .then((data) => {
+                    this.queueItems = data?.data?.items || [];
+                })
+                .catch((error) => {
+                    console.error('Error loading listing queue: ', error);
+                })
+                .finally(() => {
+                    this.queueLoading = false;
+                });
+        },
+
+        openQueueItemPrice(item: ListingQueueItem) {
+            (this.$refs.priceModal as { show: (edit: boolean, payload?: object) => void }).show(false, {
+                sku: item.sku,
+                name: item.name,
+                max: Math.max(1, item.count || 1),
+                min: 0,
+                intent: 1,
+                enabled: true,
+                autoprice: false,
+                buy: { keys: 0, metal: 0 },
+                sell: { keys: 0, metal: 0 },
+                promoted: 0,
+                group: 'all',
+                note: { buy: '', sell: '' }
+            });
+        },
+
+        onQueueItemListed(item: ListingQueueItem) {
+            this.addMessage({ msg: `Listed ${item.name} for sale.`, type: 'Success' });
+            this.loadItems();
+            this.loadQueue();
+        },
+
+        onQueueItemRemoved(item: ListingQueueItem) {
+            this.addMessage({ msg: `Removed ${item.name} from queue.`, type: 'info' });
+        },
+
+        onQueueError(message: string) {
+            this.addMessage({ msg: message, type: 'Danger' });
         }
     },
 
     created() {
         this.loadItems();
+        this.loadQueue();
     },
 
     mounted() {

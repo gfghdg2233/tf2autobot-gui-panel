@@ -586,6 +586,25 @@
         opacity: 0.85;
     }
 
+    .queue-count-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 1.2rem;
+        height: 1.2rem;
+        margin-left: 0.35rem;
+        padding: 0 0.35rem;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.28);
+        font-size: 0.72rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .page-tab-bar .filter-pill.active .queue-count-badge {
+        background: rgba(0, 0, 0, 0.22);
+    }
+
     .toolbar-row {
         display: flex;
         flex-wrap: wrap;
