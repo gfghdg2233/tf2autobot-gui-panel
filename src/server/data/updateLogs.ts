@@ -7,6 +7,16 @@ export interface UpdateLogEntry {
 
 export const UPDATE_LOGS: UpdateLogEntry[] = [
 	{
+		version: '3.5.7',
+		date: '2026-07-11',
+		title: 'Unlisted Stock pricelist filtering fix',
+		changes: [
+			'Fixed Unlisted Stock hiding items that are already on your pricelist when using tf2autobot-pricedb',
+			'Pricelist IPC from pricedb sends an array — panel now handles both array and keyed-object formats',
+			'Actively listed items (enabled with buy/sell intent) are correctly excluded from unlisted view'
+		]
+	},
+	{
 		version: '3.5.6',
 		date: '2026-07-07',
 		title: 'Quieter console logging',
