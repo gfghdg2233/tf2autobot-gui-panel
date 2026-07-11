@@ -7,6 +7,17 @@ export interface UpdateLogEntry {
 
 export const UPDATE_LOGS: UpdateLogEntry[] = [
 	{
+		version: '3.5.8',
+		date: '2026-07-11',
+		title: 'Unlisted Stock listing feedback',
+		changes: [
+			'Fixed List for sale and bulk list actions on the Unlisted Stock page',
+			'Bot error strings from tf2autobot-pricedb IPC are shown in the UI instead of failing silently',
+			'Already-priced items are upserted — add falls back to update when re-listing from Unlisted Stock',
+			'Row animations show listing progress, success removal, and failure states'
+		]
+	},
+	{
 		version: '3.5.7',
 		date: '2026-07-11',
 		title: 'Unlisted Stock pricelist filtering fix',
