@@ -37,7 +37,7 @@ declare -A TAGS=(
     [v3.5.8]=3631999
     [v3.5.9]=97ee2bb
     [v3.6.0]=309cfa3
-    [v3.6.1]=RELEASE_SHA_PLACEHOLDER
+    [v3.6.1]=15c3661
 )
 
 declare -A TITLES=(
