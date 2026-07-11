@@ -1,12 +1,22 @@
 import SKU from '@tf2autobot/tf2-sku';
 import SchemaManager from '@tf2autobot/tf2-schema';
-import { Pricelist } from '../../common/types/pricelist';
+import { Pricelist, PricelistItem } from '../../common/types/pricelist';
 import { InventorySnapshot, UnlistedItem } from '../../common/types/inventory';
 import getName from '../utils/getName';
 import { getImageStyle } from '../utils/getImage';
 import getStatsLink from '../utils/getStatsLink';
 import { isCurrencySku } from '../utils/currencySkus';
 import { getSkuDetails } from '../utils/skuDetails';
+
+type PricelistInput = Pricelist | PricelistItem[] | null | undefined;
+
+function getPricelistEntries(pricelist: PricelistInput): PricelistItem[] {
+	if (!pricelist) {
+		return [];
+	}
+
+	return Array.isArray(pricelist) ? pricelist : Object.values(pricelist);
+}
 
 const RECENT_TRADE_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -98,18 +108,15 @@ export function getRecentlyReceivedSkus(polldata: Record<string, unknown> | null
 	return skus;
 }
 
-function isActivelyListed(sku: string, pricelist: Pricelist): boolean {
-	const entry = pricelist?.[sku];
-	if (!entry) {
-		return false;
-	}
-
-	return entry.enabled !== false && Number(entry.intent) !== 0;
+function isActivelyListed(sku: string, pricelist: PricelistInput): boolean {
+	return getPricelistEntries(pricelist).some(
+		(entry) => entry.sku === sku && entry.enabled !== false && Number(entry.intent) !== 0
+	);
 }
 
 export function buildUnlistedItems(
 	inventory: InventorySnapshot,
-	pricelist: Pricelist,
+	pricelist: PricelistInput,
 	polldata: Record<string, unknown> | null | undefined,
 	schema: SchemaManager.Schema
 ): UnlistedItem[] {
