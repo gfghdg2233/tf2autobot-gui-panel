@@ -347,6 +347,26 @@ export default {
             return response.json();
         },
 
+        async enqueueToListingQueue(item: UnlistedRow, reason: string) {
+            try {
+                await fetch('/pricelist/queue', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sku: item.sku,
+                        name: item.name,
+                        count: item.count,
+                        reason,
+                        style: item.style,
+                        statslink: item.statslink,
+                        skuDetails: item.skuDetails
+                    })
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        },
+
         openPriceModal(item: UnlistedRow) {
             (this.$refs.priceModal as InstanceType<typeof priceModal>).show(false, this.buildListPayload(item));
         },
@@ -369,11 +389,13 @@ export default {
 
                 const message = this.getErrorMessage(result);
                 this.failedSkus[item.sku] = message;
-                this.addMessage(`${item.name}: ${message}`, 'Danger');
+                await this.enqueueToListingQueue(item, message);
+                this.addMessage(`${item.name}: ${message} Added to queue on Pricelist.`, 'Warning');
             } catch (err) {
                 const message = 'Failed to list item.';
                 this.failedSkus[item.sku] = message;
-                this.addMessage(`${item.name}: ${message}`, 'Danger');
+                await this.enqueueToListingQueue(item, message);
+                this.addMessage(`${item.name}: ${message} Added to queue on Pricelist.`, 'Warning');
                 console.error(err);
             } finally {
                 this.listingSkus = this.listingSkus.filter((sku) => sku !== item.sku);

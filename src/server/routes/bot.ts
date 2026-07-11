@@ -7,6 +7,7 @@ export = function (schemaManager: SchemaManager, botManager: BotConnectionManage
     router
         .use('/pricelist/bulk', (require('./bot/bulk'))(schemaManager, botManager))
         .use('/pricelist/live-prices', (require('./bot/livePrices'))())
+        .use('/pricelist/queue', (require('./bot/queue'))(botManager))
         .use('/pricelist/item', (require('./bot/item'))(schemaManager, botManager))
         .use('/pricelist', (require('./bot/pricelist'))(schemaManager, botManager))
     return router;
