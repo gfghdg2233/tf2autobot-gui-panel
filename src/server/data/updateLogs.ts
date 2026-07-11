@@ -7,6 +7,16 @@ export interface UpdateLogEntry {
 
 export const UPDATE_LOGS: UpdateLogEntry[] = [
 	{
+		version: '3.5.9',
+		date: '2026-07-11',
+		title: 'Pricedb pricelist array compatibility',
+		changes: [
+			'Shared getPricelistEntries() handles tf2autobot-pricedb array pricelist format in Unlisted Stock and the pricelist API',
+			'Pricelist type accepts both array and keyed-object IPC payloads from tf2autobot-pricedb',
+			'Release restore script replaces cursor[bot] GitHub releases when run as uwu6967'
+		]
+	},
+	{
 		version: '3.5.8',
 		date: '2026-07-11',
 		title: 'Unlisted Stock listing feedback',
