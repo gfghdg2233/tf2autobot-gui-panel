@@ -59,8 +59,18 @@ for tag in v3.3.3 v3.4.0 v3.4.1 v3.4.2 v3.4.3 v3.5.0 v3.5.1 v3.5.2 v3.5.3 v3.5.4
     notes="$NOTES_DIR/${tag}.md"
 
     if gh release view "$tag" >/dev/null 2>&1; then
-        echo "Skip $tag (release already exists)"
-        continue
+        author="$(gh release view "$tag" --json author --jq .author.login 2>/dev/null || echo unknown)"
+        if [[ "$author" == "$LOGIN" ]]; then
+            echo "Skip $tag (release already exists under $LOGIN)"
+            continue
+        fi
+        if [[ "$author" == "cursor[bot]" ]]; then
+            echo "Replacing cursor[bot] release $tag with $LOGIN ..."
+            gh release delete "$tag" --yes
+        else
+            echo "Skip $tag (release exists under $author)"
+            continue
+        fi
     fi
 
     if ! git rev-parse "$tag" >/dev/null 2>&1; then

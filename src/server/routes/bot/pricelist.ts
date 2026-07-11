@@ -3,6 +3,7 @@ import SchemaManager from "@tf2autobot/tf2-schema";
 import BotConnectionManager from "../../IPC";
 import processPricelistItem from '../../utils/processPricelistItem';
 import { getKeyPrice } from '../../utils/keyPrice';
+import { getPricelistEntries } from '../../utils/pricelistEntries';
 
 export = function (schemaManager: SchemaManager, botManager: BotConnectionManager): Router {
     const router = express.Router();
@@ -16,14 +17,9 @@ export = function (schemaManager: SchemaManager, botManager: BotConnectionManage
         }
         if(!pricelist) return res.json([]);
         const keyPrice = await getKeyPrice();
-        pricelist = Object.values(pricelist);
-        for (let i = 0; i < pricelist.length; i++) {
-            const item = pricelist[i];
-            pricelist[i] = processPricelistItem(item, schema, keyPrice);
-        }
-        res.json(
-            pricelist
-        );
+        const entries = getPricelistEntries(pricelist);
+        const processed = entries.map((item) => processPricelistItem(item, schema, keyPrice));
+        res.json(processed);
     });
     return router;
 }
