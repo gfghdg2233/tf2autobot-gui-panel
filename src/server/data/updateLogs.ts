@@ -7,6 +7,28 @@ export interface UpdateLogEntry {
 
 export const UPDATE_LOGS: UpdateLogEntry[] = [
 	{
+		version: '3.6.1',
+		date: '2026-07-11',
+		title: 'Unlisted list fixes for asset-keyed and manual-priced items',
+		changes: [
+			'Pass asset ids over IPC when listing unique items from Unlisted Stock',
+			'Merge existing pricelist entries on upsert instead of failing on already-priced items',
+			'Surface real bot error strings from tf2autobot-pricedb in the UI',
+			'Only queue items in the listing queue when autoprice is unavailable, not for other failures'
+		]
+	},
+	{
+		version: '3.6.0',
+		date: '2026-07-11',
+		title: 'Listing queue and manual pricelist updates',
+		changes: [
+			'Pricelist page adds a Listing Queue tab for failed unlisted items waiting to be listed manually',
+			'Autoprice-unavailable items fall back to manual pricing when listing from Unlisted Stock or the queue',
+			'Failed unlisted items are persisted in a per-bot queue and removed automatically after a successful list',
+			'Compatible with tf2autobot-pricedb v1.0.4+ array pricelist IPC and string error responses'
+		]
+	},
+	{
 		version: '3.5.9',
 		date: '2026-07-11',
 		title: 'Pricedb pricelist array compatibility',
