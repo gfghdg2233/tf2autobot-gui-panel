@@ -1,4 +1,4 @@
-export type Pricelist = {
+export type Pricelist = PricelistItem[] | {
     [sku: string]: PricelistItem
 }
 
