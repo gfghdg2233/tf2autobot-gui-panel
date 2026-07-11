@@ -10,7 +10,7 @@
             {{ msg.msg }}
         </message>
 
-        <price-modal ref="priceModal" @item="onItemListed"></price-modal>
+        <price-modal ref="priceModal" @item="onItemListed" @error="onItemListError"></price-modal>
 
         <div class="page-hero">
             <div>
@@ -76,7 +76,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="item in filteredItems" :key="item.sku" class="item-row">
+                        <tr
+                            v-for="item in filteredItems"
+                            :key="item.sku"
+                            class="item-row"
+                            :class="rowClass(item.sku)"
+                        >
                             <td>
                                 <input
                                     type="checkbox"
@@ -120,9 +125,22 @@
                             </td>
                             <td><strong>{{ item.count }}</strong></td>
                             <td>{{ bptfPrice(item) }}</td>
-                            <td class="text-end">
-                                <button class="btn btn-sm btn-primary" type="button" @click="listOne(item)">
-                                    List
+                            <td class="text-end unlisted-actions">
+                                <button
+                                    class="btn btn-sm btn-outline-light"
+                                    type="button"
+                                    @click="openPriceModal(item)"
+                                    :disabled="isRowBusy(item.sku)"
+                                >
+                                    Price…
+                                </button>
+                                <button
+                                    class="btn btn-sm btn-primary"
+                                    type="button"
+                                    @click="listOne(item)"
+                                    :disabled="isRowBusy(item.sku)"
+                                >
+                                    {{ listButtonLabel(item.sku) }}
                                 </button>
                             </td>
                         </tr>
@@ -176,7 +194,10 @@ export default {
             error: '',
             inventoryUnsupported: false,
             search: '',
-            selectedSkus: [] as string[]
+            selectedSkus: [] as string[],
+            listingSkus: [] as string[],
+            removingSkus: [] as string[],
+            failedSkus: {} as Record<string, string>
         };
     },
 
@@ -240,16 +261,123 @@ export default {
             }
         },
 
-        listOne(item: UnlistedRow) {
-            (this.$refs.priceModal as InstanceType<typeof priceModal>).show(false, {
+        rowClass(sku: string): Record<string, boolean> {
+            return {
+                'is-listing': this.listingSkus.includes(sku),
+                'is-removing': this.removingSkus.includes(sku),
+                'is-failed': !!this.failedSkus[sku]
+            };
+        },
+
+        isRowBusy(sku: string): boolean {
+            return this.listingSkus.includes(sku) || this.removingSkus.includes(sku);
+        },
+
+        listButtonLabel(sku: string): string {
+            if (this.removingSkus.includes(sku)) {
+                return 'Listed';
+            }
+
+            if (this.listingSkus.includes(sku)) {
+                return 'Listing…';
+            }
+
+            return 'List';
+        },
+
+        buildListPayload(item: UnlistedRow) {
+            return {
                 sku: item.sku,
                 name: item.name,
                 max: Math.max(1, item.count),
                 min: 0,
                 intent: 1,
                 enabled: true,
-                autoprice: true
+                autoprice: true,
+                buy: { keys: 0, metal: 0 },
+                sell: { keys: 0, metal: 0 },
+                promoted: 0,
+                group: 'all',
+                note: { buy: '', sell: '' }
+            };
+        },
+
+        getErrorMessage(payload: unknown): string {
+            if (typeof payload === 'string' && payload) {
+                return payload;
+            }
+
+            if (payload && typeof payload === 'object') {
+                const obj = payload as { msg?: { message?: string }; message?: string };
+                return obj.msg?.message || obj.message || 'Failed to list item.';
+            }
+
+            return 'Failed to list item.';
+        },
+
+        isListSuccess(payload: unknown): payload is { sku: string } {
+            return !!payload && typeof payload === 'object' && typeof (payload as { sku?: string }).sku === 'string';
+        },
+
+        markListed(sku: string, name?: string) {
+            delete this.failedSkus[sku];
+            this.selectedSkus = this.selectedSkus.filter((entry) => entry !== sku);
+
+            if (!this.removingSkus.includes(sku)) {
+                this.removingSkus.push(sku);
+            }
+
+            if (name) {
+                this.addMessage(`Listed ${name} for sale.`, 'Success');
+            }
+
+            window.setTimeout(() => {
+                this.items = this.items.filter((item) => item.sku !== sku);
+                this.removingSkus = this.removingSkus.filter((entry) => entry !== sku);
+            }, 650);
+        },
+
+        async postListItem(item: UnlistedRow) {
+            const response = await fetch('/pricelist/item', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(this.buildListPayload(item))
             });
+
+            return response.json();
+        },
+
+        openPriceModal(item: UnlistedRow) {
+            (this.$refs.priceModal as InstanceType<typeof priceModal>).show(false, this.buildListPayload(item));
+        },
+
+        async listOne(item: UnlistedRow) {
+            if (this.isRowBusy(item.sku)) {
+                return;
+            }
+
+            this.listingSkus.push(item.sku);
+            delete this.failedSkus[item.sku];
+
+            try {
+                const result = await this.postListItem(item);
+
+                if (this.isListSuccess(result)) {
+                    this.markListed(item.sku, item.name);
+                    return;
+                }
+
+                const message = this.getErrorMessage(result);
+                this.failedSkus[item.sku] = message;
+                this.addMessage(`${item.name}: ${message}`, 'Danger');
+            } catch (err) {
+                const message = 'Failed to list item.';
+                this.failedSkus[item.sku] = message;
+                this.addMessage(`${item.name}: ${message}`, 'Danger');
+                console.error(err);
+            } finally {
+                this.listingSkus = this.listingSkus.filter((sku) => sku !== item.sku);
+            }
         },
 
         async listSelected() {
@@ -280,9 +408,12 @@ export default {
                 const result = await response.json();
 
                 if (result.success) {
-                    this.addMessage(`Listed ${this.selectedSkus.length} item(s) for sale.`, 'Success');
+                    const listed = [...this.selectedSkus];
+                    this.addMessage(`Listed ${listed.length} item(s) for sale.`, 'Success');
                     this.selectedSkus = [];
-                    await this.loadItems();
+                    for (const sku of listed) {
+                        this.markListed(sku);
+                    }
                 } else {
                     this.addMessage(result.msg?.message || 'Bulk list failed.', 'Danger');
                 }
@@ -294,9 +425,12 @@ export default {
             }
         },
 
-        onItemListed() {
-            this.addMessage('Item added to pricelist.', 'Success');
-            this.loadItems();
+        onItemListed(event: { data: { sku: string; name?: string } }) {
+            this.markListed(event.data.sku, event.data.name);
+        },
+
+        onItemListError(message: string) {
+            this.addMessage(message, 'Danger');
         },
 
         async loadItems() {
@@ -380,6 +514,40 @@ export default {
     padding: 0.65rem 0.85rem;
     color: #ece5d8;
     border-color: rgba(255, 255, 255, 0.05);
+    transition: background-color 0.25s ease, opacity 0.45s ease, transform 0.45s ease;
+}
+
+.unlisted-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.45rem;
+    white-space: nowrap;
+}
+
+.item-row.is-listing {
+    background: rgba(240, 192, 96, 0.12);
+    animation: unlisted-pulse 0.9s ease-in-out infinite;
+}
+
+.item-row.is-removing {
+    background: rgba(90, 140, 58, 0.18);
+    opacity: 0.35;
+    transform: translateX(12px);
+}
+
+.item-row.is-failed {
+    background: rgba(156, 52, 40, 0.16);
+}
+
+@keyframes unlisted-pulse {
+    0%,
+    100% {
+        box-shadow: inset 0 0 0 0 rgba(240, 192, 96, 0);
+    }
+
+    50% {
+        box-shadow: inset 0 0 0 1px rgba(240, 192, 96, 0.45);
+    }
 }
 
 .item-main {
