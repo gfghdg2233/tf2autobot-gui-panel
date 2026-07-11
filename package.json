@@ -11,7 +11,8 @@
     "build-back-watch": "tsc -p ./src/server -w",
     "start": "node dist/server/index.js",
     "stop": "fuser -k 3001/tcp 2>/dev/null || fuser -k 3000/tcp 2>/dev/null || true",
-    "lint": "eslint \"**/*.js\""
+    "lint": "eslint \"**/*.js\"",
+    "verify-pricedb": "npm run build-back && node scripts/verify-pricedb-pricelist.js"
   },
   "repository": {
     "type": "git",

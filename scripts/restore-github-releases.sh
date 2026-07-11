@@ -11,9 +11,16 @@ if ! gh auth status >/dev/null 2>&1; then
     exit 1
 fi
 
-LOGIN="$(gh api user --jq .login)"
-if [[ "$LOGIN" == "cursor[bot]" ]]; then
-    echo "Logged in as cursor[bot]. Switch to your GitHub account first:"
+LOGIN="$(gh api user --jq .login 2>/dev/null || true)"
+if [[ -z "$LOGIN" || "$LOGIN" == *"Resource not accessible"* ]]; then
+    LOGIN="$(gh auth status 2>&1 | sed -n 's/.*account \([^ ]*\).*/\1/p' | head -1)"
+fi
+if [[ -z "$LOGIN" ]]; then
+    echo "Could not determine GitHub login. Run: gh auth login"
+    exit 1
+fi
+if [[ "$LOGIN" == "cursor[bot]" || "$LOGIN" == "cursor" ]]; then
+    echo "Logged in as $LOGIN. Switch to your GitHub account first:"
     echo "  gh auth login"
     exit 1
 fi
