@@ -38,7 +38,7 @@ declare -A TAGS=(
     [v3.5.9]=97ee2bb
     [v3.6.0]=309cfa3
     [v3.6.1]=15c3661
-    [v3.6.2]=9939f6f
+    [v3.6.2]=e7f956b
 )
 
 declare -A TITLES=(
