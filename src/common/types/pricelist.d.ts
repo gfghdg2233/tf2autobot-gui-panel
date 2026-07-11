@@ -4,6 +4,7 @@ export type Pricelist = PricelistItem[] | {
 
 export interface PricelistItem {
     sku: string
+    id?: string;
     name?: string;
     max: number;
     min: number;

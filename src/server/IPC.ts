@@ -90,6 +90,7 @@ export default class BotConnectionManager {
 
         return {
             sku: raw.sku,
+            id: raw.id,
             enabled: raw.enabled,
             autoprice: raw.autoprice,
             min: raw.min,

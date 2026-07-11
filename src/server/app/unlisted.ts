@@ -7,7 +7,7 @@ import { getImageStyle } from '../utils/getImage';
 import getStatsLink from '../utils/getStatsLink';
 import { isCurrencySku } from '../utils/currencySkus';
 import { getSkuDetails } from '../utils/skuDetails';
-import { getPricelistEntries, PricelistInput } from '../utils/pricelistEntries';
+import { getPricelistEntries, isActivelyListedEntry, normalizeSku, PricelistInput } from '../utils/pricelistEntries';
 
 const RECENT_TRADE_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -100,8 +100,10 @@ export function getRecentlyReceivedSkus(polldata: Record<string, unknown> | null
 }
 
 function isActivelyListed(sku: string, pricelist: PricelistInput): boolean {
+	const target = normalizeSku(sku);
+
 	return getPricelistEntries(pricelist).some(
-		(entry) => entry.sku === sku && entry.enabled !== false && Number(entry.intent) !== 0
+		(entry) => normalizeSku(entry.sku) === target && isActivelyListedEntry(entry)
 	);
 }
 

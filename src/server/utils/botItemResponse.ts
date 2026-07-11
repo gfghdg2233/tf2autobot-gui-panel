@@ -1,4 +1,13 @@
 import { PricelistItem } from '../../common/types/pricelist';
+import {
+	findPricelistEntryBySku,
+	getPricelistEntries,
+	isActivelyListedEntry,
+	normalizeSku,
+	PricelistInput
+} from './pricelistEntries';
+
+export { findPricelistEntryBySku, getPricelistEntries, isActivelyListedEntry, normalizeSku, PricelistInput };
 
 export function isPricelistItem(ret: unknown): ret is PricelistItem {
 	return !!ret && typeof ret === 'object' && typeof (ret as PricelistItem).sku === 'string';
@@ -10,7 +19,7 @@ export function getBotItemError(ret: unknown): string | null {
 	}
 
 	if (typeof ret === 'string') {
-		return ret;
+		return ret || 'Unknown bot error';
 	}
 
 	if (isPricelistItem(ret)) {
@@ -22,9 +31,12 @@ export function getBotItemError(ret: unknown): string | null {
 		if (typeof obj.message === 'string' && obj.message) {
 			return obj.message;
 		}
+		if (typeof obj.error === 'string' && obj.error) {
+			return obj.error;
+		}
 	}
 
-	return 'Failed to update pricelist';
+	return 'The bot returned an unexpected response';
 }
 
 export function isAlreadyPricedError(message: string): boolean {

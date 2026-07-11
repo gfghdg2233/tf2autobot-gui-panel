@@ -389,13 +389,17 @@ export default {
 
                 const message = this.getErrorMessage(result);
                 this.failedSkus[item.sku] = message;
-                await this.enqueueToListingQueue(item, message);
-                this.addMessage(`${item.name}: ${message} Added to queue on Pricelist.`, 'Warning');
+
+                if (/autoprice is not available/i.test(message)) {
+                    await this.enqueueToListingQueue(item, message);
+                    this.addMessage(`${item.name}: Autoprice unavailable — use Price… to set a manual price. Added to queue.`, 'Warning');
+                } else {
+                    this.addMessage(`${item.name}: ${message}`, 'Danger');
+                }
             } catch (err) {
                 const message = 'Failed to list item.';
                 this.failedSkus[item.sku] = message;
-                await this.enqueueToListingQueue(item, message);
-                this.addMessage(`${item.name}: ${message} Added to queue on Pricelist.`, 'Warning');
+                this.addMessage(`${item.name}: ${message}`, 'Danger');
                 console.error(err);
             } finally {
                 this.listingSkus = this.listingSkus.filter((sku) => sku !== item.sku);
