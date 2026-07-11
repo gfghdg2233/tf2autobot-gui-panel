@@ -101,8 +101,10 @@
 
         <template v-slot:footer>
             <button type="button" v-if="!edit" class="btn btn-outline-light" @click="resetModal()">Clear</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-primary" @click.prevent="saveItem">Save</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" :disabled="saving">Cancel</button>
+            <button type="submit" class="btn btn-primary" @click.prevent="saveItem" :disabled="saving">
+                {{ saving ? 'Saving…' : 'Save' }}
+            </button>
             <button type="button" v-if="edit" class="btn btn-danger" @click="deleteItem(item)">Delete item</button>
         </template>
     </modal>
@@ -118,6 +120,7 @@ interface data {
     edit: boolean;
     item: PricelistItem;
     modal: bootstrap.Modal;
+    saving: boolean;
 }
 
 export default {
@@ -125,13 +128,14 @@ export default {
         modal,
         itemSearch
     },
-    emits: ['item'],
+    emits: ['item', 'error'],
     props: ['reloadItems'],
     data(): data {
         return {
             edit: false,
             item: {} as PricelistItem,
-            modal: null
+            modal: null,
+            saving: false
         };
     },
     methods: {
@@ -196,10 +200,12 @@ export default {
             this.edit = false;
         },
         saveItem() {
-            if (!this.item.sku) {
+            if (!this.item.sku || this.saving) {
                 return;
             }
-            this.hide();
+
+            this.saving = true;
+
             fetch('/pricelist/item', {
                 method: this.edit ? 'PATCH' : 'POST',
                 body: JSON.stringify(this.item),
@@ -207,16 +213,29 @@ export default {
                     'Content-Type': 'application/json'
                 }
             })
-                .then(res => res.json())
-                .then(res => {
-                    if (typeof res === 'object') {
-                        this.$emit('item', { type: this.edit ? 'patch' : 'new', data: res });
-                    } else {
-                        console.error(res);
+                .then(async (res) => {
+                    const payload = await res.json();
+
+                    if (!res.ok || payload?.success === 0) {
+                        const message = payload?.msg?.message || (typeof payload === 'string' ? payload : 'Failed to save item');
+                        this.$emit('error', message);
+                        return;
                     }
+
+                    if (typeof payload === 'object' && payload.sku) {
+                        this.hide();
+                        this.$emit('item', { type: this.edit ? 'patch' : 'new', data: payload });
+                        return;
+                    }
+
+                    this.$emit('error', typeof payload === 'string' ? payload : 'Failed to save item');
                 })
                 .catch((error) => {
                     console.error('Error: ', error);
+                    this.$emit('error', 'Failed to save item');
+                })
+                .finally(() => {
+                    this.saving = false;
                 });
         },
         deleteItem() {

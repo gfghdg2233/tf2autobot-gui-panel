@@ -5,6 +5,26 @@ import BotConnectionManager from "../../IPC";
 import processPricelistItem from "../../utils/processPricelistItem";
 import { getKeyPrice } from "../../utils/keyPrice";
 import {checkItem} from "./checkItem";
+import { getBotItemError, isAlreadyPricedError, isPricelistItem } from '../../utils/botItemResponse';
+
+async function savePricelistItem(
+	botManager: BotConnectionManager,
+	botId: string,
+	item: PricelistItem,
+	mode: 'add' | 'update'
+) {
+	let ret = mode === 'add'
+		? await botManager.addItem(botId, item)
+		: await botManager.updateItem(botId, item);
+	let error = getBotItemError(ret);
+
+	if (mode === 'add' && error && isAlreadyPricedError(error)) {
+		ret = await botManager.updateItem(botId, item);
+		error = getBotItemError(ret);
+	}
+
+	return { ret, error };
+}
 
 export = function (schemaManager: SchemaManager, botManager: BotConnectionManager): Router {
     const router = express.Router();
@@ -13,12 +33,17 @@ export = function (schemaManager: SchemaManager, botManager: BotConnectionManage
         const item = req.body as PricelistItem;
         if(checkItem(item, res)) return;
         try {
-            const ret = await botManager.addItem(req.session.bot ,item);
+            const { ret, error } = await savePricelistItem(botManager, req.session.bot, item, 'add');
+            if (error) {
+                res.status(400).json({ success: 0, msg: { type: 'error', message: error } });
+                return;
+            }
+
             const keyPrice = await getKeyPrice();
-            if(typeof ret === 'object') {
+            if (isPricelistItem(ret)) {
                 res.json(processPricelistItem(ret, schema, keyPrice));
             } else {
-                res.json(typeof ret === "string" ? ret : "");
+                res.status(500).json({ success: 0, msg: { type: 'error', message: 'Failed to add item' } });
             }
         } catch (err) {
             console.error(err);
@@ -29,12 +54,17 @@ export = function (schemaManager: SchemaManager, botManager: BotConnectionManage
         const item = req.body as PricelistItem;
         if(checkItem(item, res)) return;
         try {
-            const ret = await botManager.updateItem(req.session.bot, item);
+            const { ret, error } = await savePricelistItem(botManager, req.session.bot, item, 'update');
+            if (error) {
+                res.status(400).json({ success: 0, msg: { type: 'error', message: error } });
+                return;
+            }
+
             const keyPrice = await getKeyPrice();
-            if(typeof ret === 'object') {
+            if (isPricelistItem(ret)) {
                 res.json(processPricelistItem(ret, schema, keyPrice));
             } else {
-                res.json(typeof ret === "string" ? ret : "");
+                res.status(500).json({ success: 0, msg: { type: 'error', message: 'Failed to update item' } });
             }
         } catch (err) {
             console.error(err);
@@ -45,10 +75,16 @@ export = function (schemaManager: SchemaManager, botManager: BotConnectionManage
         const sku = req.body.sku as string;
         botManager.removeItem(req.session.bot, sku)
             .then(ret => {
-                if(typeof ret === 'object') {
+                const error = getBotItemError(ret);
+                if (error) {
+                    res.status(400).json({ success: 0, msg: { type: 'error', message: error } });
+                    return;
+                }
+
+                if (isPricelistItem(ret)) {
                     res.json(ret);
                 } else {
-                    res.json(typeof ret === "string" ? ret : ""); // make sure r is string
+                    res.json(typeof ret === "string" ? ret : "");
                 }
             });
     });

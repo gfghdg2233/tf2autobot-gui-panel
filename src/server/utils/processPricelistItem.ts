@@ -12,6 +12,10 @@ export default function process(item: PricelistItem, schema: Schema, keyPrice: n
     }
     item.statslink = getStatsLink(item.sku, schema);
     [item.buy, item.sell].forEach((prices) => {
+        if (!prices) {
+            return;
+        }
+
         const currency = new Currency({
             metal: prices.metal,
             keys: prices.keys

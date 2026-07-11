@@ -268,6 +268,9 @@ export default class BotConnectionManager {
             const queuedEvents = ['options', 'optionsUpdated', 'itemAdded', 'itemUpdated', 'itemRemoved', 'polldata', 'chatResp', 'untradableJunkDeleted', 'inventory'];
             for (const event of queuedEvents) {
                 this.ipc.server.on(event, (data, socket) => {
+                    if (['itemAdded', 'itemUpdated', 'itemRemoved'].includes(event) && socket.id && this.bots[socket.id]) {
+                        delete this.bots[socket.id].pricelistTS;
+                    }
                     this.resolveNextResponse(socket, event, data);
                 });
             }
