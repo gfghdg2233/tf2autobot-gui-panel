@@ -8,7 +8,7 @@ DATA_DIR="$ROOT/data"
 LOG="$DATA_DIR/panel-update.log"
 JOB="$DATA_DIR/panel-update-job.json"
 BRANCH="${PANEL_GIT_BRANCH:-main}"
-PM2_NAME="${PANEL_PM2_NAME:-GUI}"
+PM2_NAME="${PANEL_PM2_NAME:-panel}"
 
 mkdir -p "$DATA_DIR"
 

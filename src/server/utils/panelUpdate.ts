@@ -190,13 +190,28 @@ async function saveState(state: PanelUpdateState): Promise<void> {
     await fs.writeJson(SETTINGS_PATH, state, { spaces: 2 });
 }
 
+const STALE_JOB_MS = 30 * 60 * 1000;
+
 async function readJob(): Promise<UpdateJob> {
     if (!await fs.pathExists(JOB_PATH)) {
         return { status: 'idle' };
     }
 
     try {
-        return await fs.readJson(JOB_PATH) as UpdateJob;
+        const job = await fs.readJson(JOB_PATH) as UpdateJob;
+
+        if (job.status === 'running' && job.startedAt && Date.now() - job.startedAt > STALE_JOB_MS) {
+            const staleJob: UpdateJob = {
+                status: 'failed',
+                startedAt: job.startedAt,
+                finishedAt: Date.now(),
+                error: 'Update timed out or was interrupted. Try again.'
+            };
+            await fs.writeJson(JOB_PATH, staleJob, { spaces: 2 });
+            return staleJob;
+        }
+
+        return job;
     } catch {
         return { status: 'idle' };
     }
