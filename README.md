@@ -4,7 +4,7 @@ A web panel for managing your [TF2Autobot](https://github.com/TF2Autobot/tf2auto
 
 > **Recommended bot:** Use [**tf2autobot-pricedb**](https://github.com/uwu6967/tf2autobot-pricedb) with this panel. It is the tested fork for live pricedb.io prices, IPC, and the optional junk-deletion patches documented in this repo.
 
-**Current version:** 3.5.9
+**Current version:** 3.6.0
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-green.svg)
@@ -58,7 +58,7 @@ On Linux you can also use `./start.sh`. On Windows, run `start.bat` after buildi
 
 For a full walkthrough — bot setup, IPC, first login, and troubleshooting — see **[TUTORIAL.md](TUTORIAL.md)**.
 
-Latest release: [v3.5.9](https://github.com/uwu6967/tf2autobot-gui-panel/releases/tag/v3.5.9)
+Latest release: [v3.6.0](https://github.com/uwu6967/tf2autobot-gui-panel/releases/tag/v3.6.0)
 
 ---
 
