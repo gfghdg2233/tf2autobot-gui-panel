@@ -12,7 +12,10 @@
     "start": "node dist/server/index.js",
     "stop": "fuser -k 3001/tcp 2>/dev/null || fuser -k 3000/tcp 2>/dev/null || true",
     "lint": "eslint \"**/*.js\"",
-    "verify-pricedb": "node scripts/verify-pricedb-pricelist.js && node scripts/verify-pricedb-item-errors.js"
+    "verify-pricedb": "node scripts/verify-pricedb-pricelist.js && node scripts/verify-pricedb-item-errors.js && node scripts/verify-pricedb-asset-id.js",
+    "verify-version": "node scripts/verify-version.js",
+    "verify-release-author": "node scripts/verify-release-author.js",
+    "verify": "npm run verify-version && npm run build && npm run verify-pricedb"
   },
   "repository": {
     "type": "git",
