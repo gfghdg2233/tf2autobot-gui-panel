@@ -8,6 +8,7 @@ export interface UnlistedItem {
 	sku: string;
 	name: string;
 	count: number;
+	assetIds?: string[];
 	style: {
 		quality_color?: string;
 		border_color?: string;

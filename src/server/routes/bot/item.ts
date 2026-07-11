@@ -6,7 +6,7 @@ import processPricelistItem from "../../utils/processPricelistItem";
 import { getKeyPrice } from "../../utils/keyPrice";
 import {checkItem} from "./checkItem";
 import {
-	findPricelistEntryBySku,
+	findPricelistEntryBySkuOrId,
 	formatBotItemError,
 	getBotItemError,
 	isActivelyListedEntry,
@@ -44,7 +44,7 @@ async function savePricelistItem(
 	mode: 'add' | 'update'
 ) {
 	const pricelist = await botManager.getBotPricelist(botId).catch(() => null);
-	const existing = findPricelistEntryBySku(pricelist, item.sku);
+	const existing = findPricelistEntryBySkuOrId(pricelist, item.sku, item.id);
 
 	if (mode === 'add' && existing) {
 		if (isActivelyListedEntry(existing) && item.autoprice) {
@@ -137,7 +137,7 @@ export = function (schemaManager: SchemaManager, botManager: BotConnectionManage
         if(checkItem(item, res)) return;
         try {
             const pricelist = await botManager.getBotPricelist(req.session.bot).catch(() => null);
-            const existing = findPricelistEntryBySku(pricelist, item.sku);
+            const existing = findPricelistEntryBySkuOrId(pricelist, item.sku, item.id);
             const payload = existing ? mergeWithExistingEntry(item, existing) : item;
             prepareItemForSave(payload);
 

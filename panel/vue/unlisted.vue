@@ -164,6 +164,7 @@ interface UnlistedRow {
     sku: string;
     name: string;
     count: number;
+    assetIds?: string[];
     style: Record<string, unknown>;
     statslink?: string;
     recent: boolean;
@@ -286,7 +287,7 @@ export default {
         },
 
         buildListPayload(item: UnlistedRow) {
-            return {
+            const payload: Record<string, unknown> = {
                 sku: item.sku,
                 name: item.name,
                 max: Math.max(1, item.count),
@@ -300,6 +301,12 @@ export default {
                 group: 'all',
                 note: { buy: '', sell: '' }
             };
+
+            if (item.assetIds?.length === 1) {
+                payload.id = item.assetIds[0];
+            }
+
+            return payload;
         },
 
         getErrorMessage(payload: unknown): string {

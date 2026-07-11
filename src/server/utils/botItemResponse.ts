@@ -1,13 +1,21 @@
 import { PricelistItem } from '../../common/types/pricelist';
 import {
 	findPricelistEntryBySku,
+	findPricelistEntryBySkuOrId,
 	getPricelistEntries,
 	isActivelyListedEntry,
 	normalizeSku,
 	PricelistInput
 } from './pricelistEntries';
 
-export { findPricelistEntryBySku, getPricelistEntries, isActivelyListedEntry, normalizeSku, PricelistInput };
+export {
+	findPricelistEntryBySku,
+	findPricelistEntryBySkuOrId,
+	getPricelistEntries,
+	isActivelyListedEntry,
+	normalizeSku,
+	PricelistInput
+};
 
 export function isPricelistItem(ret: unknown): ret is PricelistItem {
 	return !!ret && typeof ret === 'object' && typeof (ret as PricelistItem).sku === 'string';

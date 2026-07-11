@@ -128,6 +128,7 @@ export function buildUnlistedItems(
 
 		items.push({
 			sku,
+			assetIds: assetids,
 			name: getName(SKU.fromString(sku), schema),
 			count,
 			style: getImageStyle(sku, schema),
