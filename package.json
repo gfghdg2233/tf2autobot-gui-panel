@@ -1,6 +1,6 @@
 {
   "name": "tf2autobot-gui",
-  "version": "3.5.9",
+  "version": "3.6.1",
   "description": "An interface to easily manage your tf2autobot",
   "main": "dist/server/index.js",
   "scripts": {
@@ -11,7 +11,8 @@
     "build-back-watch": "tsc -p ./src/server -w",
     "start": "node dist/server/index.js",
     "stop": "fuser -k 3001/tcp 2>/dev/null || fuser -k 3000/tcp 2>/dev/null || true",
-    "lint": "eslint \"**/*.js\""
+    "lint": "eslint \"**/*.js\"",
+    "verify-pricedb": "node scripts/verify-pricedb-pricelist.js && node scripts/verify-pricedb-item-errors.js"
   },
   "repository": {
     "type": "git",
