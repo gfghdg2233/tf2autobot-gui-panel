@@ -29,6 +29,7 @@ export interface PricelistItem {
     autoprice: boolean;
     autopriceSell?: boolean;
     autopriceBuy?: boolean;
+    isPartialPriced?: boolean;
     time: number;
     statslink?: string;
     bptfPrice?: LivePriceItem | null;

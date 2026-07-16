@@ -13,7 +13,7 @@ import {
 	isAlreadyPricedError,
 	isAutopriceUnavailableError,
 	isPricelistItem,
-	prepareItemForSave
+	prepareItemForBot
 } from '../../utils/botItemResponse';
 import { removeListingQueueItem } from '../../app/listingQueue';
 
@@ -73,14 +73,15 @@ async function savePricelistItem(
 		}
 
 		const merged = mergeWithExistingEntry(item, existing);
-		prepareItemForSave(merged);
+		await prepareItemForBot(merged);
 
 		let ret = await botManager.updateItem(botId, merged);
 		let error = getBotItemError(ret);
 
 		if (error && isAutopriceUnavailableError(error) && merged.autoprice) {
 			merged.autoprice = false;
-			prepareItemForSave(merged);
+			merged.isPartialPriced = false;
+			await prepareItemForBot(merged);
 			ret = await botManager.updateItem(botId, merged);
 			error = getBotItemError(ret);
 		}
@@ -95,7 +96,7 @@ async function savePricelistItem(
 
 	if (mode === 'add' && error && isAlreadyPricedError(error)) {
 		const merged = existing ? mergeWithExistingEntry(item, existing) : item;
-		prepareItemForSave(merged);
+		await prepareItemForBot(merged);
 		ret = await botManager.updateItem(botId, merged);
 		error = getBotItemError(ret);
 	}
@@ -103,13 +104,14 @@ async function savePricelistItem(
 	if (error && isAutopriceUnavailableError(error) && item.autoprice) {
 		if (existing && (existing.buy || existing.sell)) {
 			const merged = mergeWithExistingEntry({ ...item, autoprice: false }, existing);
-			prepareItemForSave(merged);
+			await prepareItemForBot(merged);
 			ret = await botManager.updateItem(botId, merged);
 			error = getBotItemError(ret);
 		} else {
 			const manualItem = JSON.parse(JSON.stringify(item)) as PricelistItem;
 			manualItem.autoprice = false;
-			prepareItemForSave(manualItem);
+			manualItem.isPartialPriced = false;
+			await prepareItemForBot(manualItem);
 
 			if (manualItem.buy?.keys || manualItem.buy?.metal || manualItem.sell?.keys || manualItem.sell?.metal) {
 				ret = mode === 'add'
@@ -133,8 +135,9 @@ export = function (schemaManager: SchemaManager, botManager: BotConnectionManage
     const schema = schemaManager.schema;
     router.post('/', async (req,res)=>{
         const item = req.body as PricelistItem;
-        if(checkItem(item, res)) return;
         try {
+            await prepareItemForBot(item);
+            if (checkItem(item, res)) return;
             const { ret, error } = await savePricelistItem(botManager, req.session.bot, item, 'add');
             if (error) {
                 res.status(400).json({ success: 0, msg: { type: 'error', message: error } });
@@ -155,12 +158,12 @@ export = function (schemaManager: SchemaManager, botManager: BotConnectionManage
     });
     router.patch('/', async (req,res)=>{
         const item = req.body as PricelistItem;
-        if(checkItem(item, res)) return;
         try {
             const pricelist = await botManager.getBotPricelist(req.session.bot).catch(() => null);
             const existing = findPricelistEntryBySku(pricelist, item.sku);
             const payload = existing ? mergeWithExistingEntry(item, existing) : item;
-            prepareItemForSave(payload);
+            await prepareItemForBot(payload);
+            if (checkItem(payload, res)) return;
 
             const { ret, error } = await savePricelistItem(botManager, req.session.bot, payload, 'update');
             if (error) {

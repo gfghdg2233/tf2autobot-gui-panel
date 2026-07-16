@@ -93,8 +93,6 @@ export default class BotConnectionManager {
             id: raw.id,
             enabled: raw.enabled,
             autoprice: raw.autoprice,
-            autopriceSell: raw.autopriceSell === true,
-            autopriceBuy: raw.autopriceBuy === true,
             min: raw.min,
             max: raw.max,
             intent: Number.parseInt(String(raw.intent ?? ''), 10),
@@ -103,7 +101,7 @@ export default class BotConnectionManager {
             promoted: raw.promoted,
             group: raw.group,
             note: { buy: note.buy ?? '', sell: note.sell ?? '' },
-            isPartialPriced: raw.isPartialPriced
+            isPartialPriced: raw.isPartialPriced === true
         };
     }
 

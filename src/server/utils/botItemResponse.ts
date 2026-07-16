@@ -6,6 +6,7 @@ import {
 	normalizeSku,
 	PricelistInput
 } from './pricelistEntries';
+import { getLivePricesForSkus } from './livePrices';
 
 export { findPricelistEntryBySku, getPricelistEntries, isActivelyListedEntry, normalizeSku, PricelistInput };
 
@@ -60,41 +61,145 @@ function hasManualPrice(item: PricelistItem, side: 'buy' | 'sell'): boolean {
 	return !!price && (Number(price.keys) > 0 || Number(price.metal) > 0);
 }
 
-export function prepareItemForSave(item: PricelistItem): void {
-	item.buy = item.buy || { keys: 0, metal: 0 };
-	item.sell = item.sell || { keys: 0, metal: 0 };
+function pricesRoughlyEqual(
+	left?: { keys?: number; metal?: number } | null,
+	right?: { keys?: number; metal?: number } | null
+): boolean {
+	return Number(left?.keys || 0) === Number(right?.keys || 0)
+		&& Number(left?.metal || 0) === Number(right?.metal || 0);
+}
+
+function normalizePanelAutopriceFlags(item: PricelistItem): void {
 	item.autopriceSell = item.autopriceSell === true;
 	item.autopriceBuy = item.autopriceBuy === true;
 
 	if (item.autoprice) {
 		item.autopriceSell = false;
 		item.autopriceBuy = false;
-		item.buy = { keys: 0, metal: 0 };
-		item.sell = { keys: 0, metal: 0 };
-		return;
-	}
-
-	if (item.autopriceSell && item.autopriceBuy) {
-		// Prefer sell-only if both somehow set; bot will also reject this combo
+	} else if (item.autopriceSell && item.autopriceBuy) {
 		item.autopriceBuy = false;
 	}
+}
 
-	if (item.autopriceSell) {
-		// Manual buy stays; sell is filled by the bot from PriceDB
-		item.sell = { keys: 0, metal: 0 };
-		return;
-	}
+function clearPanelAutopriceFlags(item: PricelistItem): void {
+	delete item.autopriceSell;
+	delete item.autopriceBuy;
+}
 
-	if (item.autopriceBuy) {
-		// Manual sell stays; buy is filled by the bot from PriceDB
+type LivePriceRef = {
+	buy?: { keys?: number; metal?: number } | null;
+	sell?: { keys?: number; metal?: number } | null;
+};
+
+export function applyPartialAutopriceForPricedb(item: PricelistItem, livePrice?: LivePriceRef | null): void {
+	item.buy = item.buy || { keys: 0, metal: 0 };
+	item.sell = item.sell || { keys: 0, metal: 0 };
+	normalizePanelAutopriceFlags(item);
+
+	if (item.autoprice) {
+		const wantsManualSell = Number(item.intent) !== 0 && hasManualPrice(item, 'sell');
+		const wantsManualBuy = Number(item.intent) !== 1 && hasManualPrice(item, 'buy');
+
+		if (!item.autopriceSell && !item.autopriceBuy && (wantsManualSell || wantsManualBuy)) {
+			item.autoprice = false;
+			item.isPartialPriced = false;
+			clearPanelAutopriceFlags(item);
+			return;
+		}
+
+		item.isPartialPriced = false;
 		item.buy = { keys: 0, metal: 0 };
+		item.sell = { keys: 0, metal: 0 };
+		clearPanelAutopriceFlags(item);
 		return;
 	}
 
-	const wantsManualSell = Number(item.intent) !== 0 && hasManualPrice(item, 'sell');
-	const wantsManualBuy = Number(item.intent) !== 1 && hasManualPrice(item, 'buy');
+	if (!item.autopriceSell && !item.autopriceBuy) {
+		const wantsManualSell = Number(item.intent) !== 0 && hasManualPrice(item, 'sell');
+		const wantsManualBuy = Number(item.intent) !== 1 && hasManualPrice(item, 'buy');
 
-	if (wantsManualSell || wantsManualBuy) {
-		item.autoprice = false;
+		if (wantsManualSell || wantsManualBuy) {
+			item.autoprice = false;
+			item.isPartialPriced = false;
+		}
+
+		clearPanelAutopriceFlags(item);
+		return;
 	}
+
+	item.autoprice = true;
+	item.isPartialPriced = true;
+
+	if (item.autopriceSell && !hasManualPrice(item, 'sell') && livePrice?.sell) {
+		item.sell = {
+			keys: Number(livePrice.sell.keys || 0),
+			metal: Number(livePrice.sell.metal || 0)
+		};
+	}
+
+	if (item.autopriceBuy && !hasManualPrice(item, 'buy') && livePrice?.buy) {
+		item.buy = {
+			keys: Number(livePrice.buy.keys || 0),
+			metal: Number(livePrice.buy.metal || 0)
+		};
+	}
+
+	clearPanelAutopriceFlags(item);
+}
+
+export function inferPanelAutopriceFlags(item: PricelistItem): void {
+	normalizePanelAutopriceFlags(item);
+
+	if (!item.autoprice || !item.isPartialPriced) {
+		return;
+	}
+
+	const bptf = item.bptfPrice;
+	if (!bptf?.buy || !bptf?.sell || !item.buy || !item.sell) {
+		return;
+	}
+
+	const buyMatches = pricesRoughlyEqual(item.buy, bptf.buy);
+	const sellMatches = pricesRoughlyEqual(item.sell, bptf.sell);
+
+	item.autoprice = false;
+	item.autopriceSell = false;
+	item.autopriceBuy = false;
+
+	if (!buyMatches && sellMatches) {
+		item.autopriceSell = true;
+	} else if (buyMatches && !sellMatches) {
+		item.autopriceBuy = true;
+	}
+}
+
+export async function prepareItemForBot(item: PricelistItem): Promise<void> {
+	item.buy = item.buy || { keys: 0, metal: 0 };
+	item.sell = item.sell || { keys: 0, metal: 0 };
+	normalizePanelAutopriceFlags(item);
+
+	if (item.autoprice) {
+		applyPartialAutopriceForPricedb(item);
+		return;
+	}
+
+	if (!item.autopriceSell && !item.autopriceBuy) {
+		applyPartialAutopriceForPricedb(item);
+		return;
+	}
+
+	let livePrice: LivePriceRef | null = null;
+
+	try {
+		const prices = await getLivePricesForSkus([item.sku]);
+		livePrice = prices[item.sku] ?? null;
+	} catch {
+		livePrice = null;
+	}
+
+	applyPartialAutopriceForPricedb(item, livePrice);
+}
+
+export function prepareItemForSave(item: PricelistItem): void {
+	applyPartialAutopriceForPricedb(item);
 }

@@ -190,7 +190,18 @@ export default {
             item.note = item.note || { buy: null, sell: null };
             item.autopriceSell = item.autopriceSell === true;
             item.autopriceBuy = item.autopriceBuy === true;
-            if (item.autoprice) {
+            if (item.autoprice && item.isPartialPriced) {
+                const bptf = item.bptfPrice;
+                if (bptf?.buy && bptf?.sell) {
+                    const buyMatches = Number(item.buy?.keys || 0) === Number(bptf.buy.keys || 0)
+                        && Number(item.buy?.metal || 0) === Number(bptf.buy.metal || 0);
+                    const sellMatches = Number(item.sell?.keys || 0) === Number(bptf.sell.keys || 0)
+                        && Number(item.sell?.metal || 0) === Number(bptf.sell.metal || 0);
+                    item.autoprice = false;
+                    item.autopriceSell = !buyMatches && sellMatches;
+                    item.autopriceBuy = buyMatches && !sellMatches;
+                }
+            } else if (item.autoprice) {
                 item.autopriceSell = false;
                 item.autopriceBuy = false;
             } else if (item.autopriceSell && item.autopriceBuy) {

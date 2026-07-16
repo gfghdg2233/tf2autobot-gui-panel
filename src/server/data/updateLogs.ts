@@ -7,6 +7,17 @@ export interface UpdateLogEntry {
 
 export const UPDATE_LOGS: UpdateLogEntry[] = [
 	{
+		version: '3.6.2',
+		date: '2026-07-16',
+		title: 'Autoprice sell-only / buy-only and panel self-update fixes',
+		changes: [
+			'Price modal adds sell-only and buy-only autoprice toggles for mixed manual/live pricing',
+			'Partial autoprice is translated to tf2autobot-pricedb isPartialPriced IPC before save',
+			'Panel self-update uses the correct PM2 process name and recovers stale update jobs',
+			'npm run verify checks version sync, build, and pricedb compatibility smoke tests'
+		]
+	},
+	{
 		version: '3.6.1',
 		date: '2026-07-11',
 		title: 'Unlisted list fixes for asset-keyed and manual-priced items',
