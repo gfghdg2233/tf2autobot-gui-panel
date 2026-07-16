@@ -93,6 +93,8 @@ export default class BotConnectionManager {
             id: raw.id,
             enabled: raw.enabled,
             autoprice: raw.autoprice,
+            autopriceSell: raw.autopriceSell === true,
+            autopriceBuy: raw.autopriceBuy === true,
             min: raw.min,
             max: raw.max,
             intent: Number.parseInt(String(raw.intent ?? ''), 10),

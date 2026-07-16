@@ -14,7 +14,7 @@
                         <button
                             type="button"
                             class="btn btn-sm btn-outline-light apply-bptf-btn"
-                            v-if="item.bptfPrice?.buy && !item.autoprice"
+                            v-if="item.bptfPrice?.buy && !item.autoprice && !item.autopriceBuy"
                             @click="applyBptfPrice('buy')"
                         >
                             Use bptf buy
@@ -26,7 +26,7 @@
                         <button
                             type="button"
                             class="btn btn-sm btn-outline-light apply-bptf-btn"
-                            v-if="item.bptfPrice?.sell && !item.autoprice"
+                            v-if="item.bptfPrice?.sell && !item.autoprice && !item.autopriceSell"
                             @click="applyBptfPrice('sell')"
                         >
                             Use bptf sell
@@ -45,30 +45,61 @@
                     </div>
 
                     <div class="form-check form-switch" v-if="item.enabled">
-                        <input class="form-check-input" type="checkbox" name="autoprice" id="priceautoprice" v-model="item.autoprice"/>
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            name="autoprice"
+                            id="priceautoprice"
+                            v-model="item.autoprice"
+                            @change="onAutopriceChange"
+                        />
                         <label class="form-check-label" for="priceautoprice">Autoprice</label>
+                    </div>
+
+                    <div class="form-check form-switch" v-if="item.enabled && !item.autoprice">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            name="autopriceSell"
+                            id="priceautopricesell"
+                            v-model="item.autopriceSell"
+                            @change="onAutopriceSellChange"
+                        />
+                        <label class="form-check-label" for="priceautopricesell">Autoprice sell only</label>
+                    </div>
+
+                    <div class="form-check form-switch" v-if="item.enabled && !item.autoprice">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            name="autopriceBuy"
+                            id="priceautopricebuy"
+                            v-model="item.autopriceBuy"
+                            @change="onAutopriceBuyChange"
+                        />
+                        <label class="form-check-label" for="priceautopricebuy">Autoprice buy only</label>
                     </div>
                 </div>
 
                 <div class="row g-3" v-if="item.enabled && item.intent != 1">
                     <div class="col-md-6">
                         <label class="form-label" for="pricebuykeys">Your buy keys</label>
-                        <input type="number" class="form-control" id="pricebuykeys" name="buykeys" min="0" placeholder="Keys" required :disabled="item.autoprice" v-model="item.buy.keys">
+                        <input type="number" class="form-control" id="pricebuykeys" name="buykeys" min="0" placeholder="Keys" required :disabled="item.autoprice || item.autopriceBuy" v-model="item.buy.keys">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label" for="pricebuymetal">Your buy metal</label>
-                        <input type="number" class="form-control" id="pricebuymetal" name="buymetal" min="0" placeholder="Metal" step="any" required :disabled="item.autoprice" v-model="item.buy.metal">
+                        <input type="number" class="form-control" id="pricebuymetal" name="buymetal" min="0" placeholder="Metal" step="any" required :disabled="item.autoprice || item.autopriceBuy" v-model="item.buy.metal">
                     </div>
                 </div>
 
                 <div class="row g-3 mt-1" v-if="item.enabled && item.intent != 0">
                     <div class="col-md-6">
                         <label class="form-label" for="pricesellkeys">Your sell keys</label>
-                        <input type="number" class="form-control" id="pricesellkeys" name="sellkeys" min="0" placeholder="Keys" required :disabled="item.autoprice" v-model="item.sell.keys">
+                        <input type="number" class="form-control" id="pricesellkeys" name="sellkeys" min="0" placeholder="Keys" required :disabled="item.autoprice || item.autopriceSell" v-model="item.sell.keys">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label" for="pricesellmetal">Your sell metal</label>
-                        <input type="number" class="form-control" id="pricesellmetal" name="sellmetal" min="0" placeholder="Metal" step="any" required :disabled="item.autoprice" v-model="item.sell.metal">
+                        <input type="number" class="form-control" id="pricesellmetal" name="sellmetal" min="0" placeholder="Metal" step="any" required :disabled="item.autoprice || item.autopriceSell" v-model="item.sell.metal">
                     </div>
                 </div>
 
@@ -157,7 +188,31 @@ export default {
             item.buy = item.buy || { keys: 0, metal: 0 };
             item.sell = item.sell || { keys: 0, metal: 0 };
             item.note = item.note || { buy: null, sell: null };
+            item.autopriceSell = item.autopriceSell === true;
+            item.autopriceBuy = item.autopriceBuy === true;
+            if (item.autoprice) {
+                item.autopriceSell = false;
+                item.autopriceBuy = false;
+            } else if (item.autopriceSell && item.autopriceBuy) {
+                item.autopriceBuy = false;
+            }
             return item;
+        },
+        onAutopriceChange() {
+            if (this.item.autoprice) {
+                this.item.autopriceSell = false;
+                this.item.autopriceBuy = false;
+            }
+        },
+        onAutopriceSellChange() {
+            if (this.item.autopriceSell) {
+                this.item.autopriceBuy = false;
+            }
+        },
+        onAutopriceBuyChange() {
+            if (this.item.autopriceBuy) {
+                this.item.autopriceSell = false;
+            }
         },
         itemSelected(e: any) {
             this.item.sku = e.sku;
@@ -216,6 +271,8 @@ export default {
                 enabled: true,
                 intent: 2,
                 autoprice: true,
+                autopriceSell: false,
+                autopriceBuy: false,
                 time: 0
             };
             this.edit = false;

@@ -63,16 +63,38 @@ function hasManualPrice(item: PricelistItem, side: 'buy' | 'sell'): boolean {
 export function prepareItemForSave(item: PricelistItem): void {
 	item.buy = item.buy || { keys: 0, metal: 0 };
 	item.sell = item.sell || { keys: 0, metal: 0 };
+	item.autopriceSell = item.autopriceSell === true;
+	item.autopriceBuy = item.autopriceBuy === true;
+
+	if (item.autoprice) {
+		item.autopriceSell = false;
+		item.autopriceBuy = false;
+		item.buy = { keys: 0, metal: 0 };
+		item.sell = { keys: 0, metal: 0 };
+		return;
+	}
+
+	if (item.autopriceSell && item.autopriceBuy) {
+		// Prefer sell-only if both somehow set; bot will also reject this combo
+		item.autopriceBuy = false;
+	}
+
+	if (item.autopriceSell) {
+		// Manual buy stays; sell is filled by the bot from PriceDB
+		item.sell = { keys: 0, metal: 0 };
+		return;
+	}
+
+	if (item.autopriceBuy) {
+		// Manual sell stays; buy is filled by the bot from PriceDB
+		item.buy = { keys: 0, metal: 0 };
+		return;
+	}
 
 	const wantsManualSell = Number(item.intent) !== 0 && hasManualPrice(item, 'sell');
 	const wantsManualBuy = Number(item.intent) !== 1 && hasManualPrice(item, 'buy');
 
 	if (wantsManualSell || wantsManualBuy) {
 		item.autoprice = false;
-	}
-
-	if (item.autoprice) {
-		item.buy = { keys: 0, metal: 0 };
-		item.sell = { keys: 0, metal: 0 };
 	}
 }

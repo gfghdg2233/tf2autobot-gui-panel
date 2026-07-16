@@ -25,13 +25,34 @@ function mergeWithExistingEntry(requested: PricelistItem, existing: PricelistIte
 	merged.max = requested.max ?? merged.max ?? 1;
 	merged.min = requested.min ?? merged.min ?? 0;
 	merged.group = requested.group ?? merged.group ?? 'all';
+	merged.autopriceSell = requested.autopriceSell === true;
+	merged.autopriceBuy = requested.autopriceBuy === true;
+
+	if (merged.autopriceSell && merged.autopriceBuy) {
+		merged.autopriceBuy = false;
+	}
 
 	if (requested.autoprice === false || !requested.autoprice) {
 		merged.autoprice = false;
-		merged.buy = requested.buy?.keys || requested.buy?.metal ? requested.buy : merged.buy;
-		merged.sell = requested.sell?.keys || requested.sell?.metal ? requested.sell : merged.sell;
+		if (merged.autopriceBuy) {
+			// Buy comes from PriceDB; keep existing buy until bot refresh
+			merged.buy = merged.buy || { keys: 0, metal: 0 };
+			merged.sell = requested.sell?.keys || requested.sell?.metal ? requested.sell : merged.sell;
+		} else if (merged.autopriceSell) {
+			merged.buy = requested.buy?.keys || requested.buy?.metal ? requested.buy : merged.buy;
+			// Sell comes from PriceDB; keep existing sell until bot refresh
+			merged.sell = merged.sell || { keys: 0, metal: 0 };
+		} else {
+			merged.buy = requested.buy?.keys || requested.buy?.metal ? requested.buy : merged.buy;
+			merged.sell = requested.sell?.keys || requested.sell?.metal ? requested.sell : merged.sell;
+		}
 	} else if (!existing.autoprice && (merged.buy || merged.sell)) {
 		merged.autoprice = false;
+	}
+
+	if (merged.autoprice) {
+		merged.autopriceSell = false;
+		merged.autopriceBuy = false;
 	}
 
 	return merged;

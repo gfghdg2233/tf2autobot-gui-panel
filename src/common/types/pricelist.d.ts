@@ -27,6 +27,8 @@ export interface PricelistItem {
     enabled: boolean;
     intent: number;
     autoprice: boolean;
+    autopriceSell?: boolean;
+    autopriceBuy?: boolean;
     time: number;
     statslink?: string;
     bptfPrice?: LivePriceItem | null;
