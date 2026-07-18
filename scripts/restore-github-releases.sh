@@ -59,7 +59,7 @@ declare -A TITLES=(
     [v3.5.9]="v3.5.9 - Pricedb pricelist array compatibility"
     [v3.6.0]="v3.6.0 - Listing queue and manual pricelist updates"
     [v3.6.1]="v3.6.1 - Unlisted list fixes for asset-keyed items"
-    [v3.6.2]=bfad6a0165c5fa6d4b4d0dda50a0d09b9b45d9f4
+    [v3.6.2]="v3.6.2 - Partial autoprice and panel self-update fixes"
 )
 
 for tag in v3.3.3 v3.4.0 v3.4.1 v3.4.2 v3.4.3 v3.5.0 v3.5.1 v3.5.2 v3.5.3 v3.5.4 v3.5.5 v3.5.6 v3.5.7 v3.5.8 v3.5.9 v3.6.0 v3.6.1 v3.6.2; do
